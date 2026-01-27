@@ -1,0 +1,11 @@
+services:
+  black-admin:
+    build:
+      context: .
+      dockerfile: admin-panel/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./util:/src/util
+      - ./MainWindow.xaml.cs:/src/MainWindow.xaml.cs
+    restart: always

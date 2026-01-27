@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Screen - Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <main class="container">
+        <header class="glass-header">
+            <div class="logo-area">
+                <div class="pulse-ring"></div>
+                <h1>Black<span>Tool</span></h1>
+            </div>
+            <p>Configuração e Build Automatizado</p>
+        </header>
+
+        <section class="config-grid">
+            <!-- Left Panel: Text Configs -->
+            <div class="glass-card config-form">
+                <div class="card-header">
+                    <span class="icon">⚙️</span>
+                    <h3>Configurações Gerais</h3>
+                </div>
+                
+                <div class="input-group">
+                    <label for="correctPassword">Senha de Desbloqueio</label>
+                    <input type="password" id="correctPassword" placeholder="Ex: Sidney2012@">
+                </div>
+
+                <div class="input-group">
+                    <label for="customMessage">Mensagem da Tela Preta</label>
+                    <textarea id="customMessage" rows="5" placeholder="Digite a mensagem que aparecerá no monitor do cliente..."></textarea>
+                </div>
+
+                <button id="saveSettings" class="btn-primary">
+                    <span class="btn-text">Salvar Configurações</span>
+                    <span class="btn-loader"></span>
+                </button>
+            </div>
+
+            <!-- Right Panel: Asset Upload -->
+            <div class="glass-card assets-form">
+                <div class="card-header">
+                    <span class="icon">🖼️</span>
+                    <h3>Logos e Ícones</h3>
+                </div>
+
+                <div class="upload-grid">
+                    <div class="upload-item" id="drop-png">
+                        <label>Logo Principal (PNG)</label>
+                        <div class="drop-zone" onclick="document.getElementById('file-png').click()">
+                            <div class="drop-content">
+                                <span class="upload-icon">📁</span>
+                                <p>logo.png</p>
+                            </div>
+                            <input type="file" id="file-png" hidden accept=".png">
+                        </div>
+                    </div>
+
+                    <div class="upload-item" id="drop-ico">
+                        <label>Ícone Executável (ICO)</label>
+                        <div class="drop-zone" onclick="document.getElementById('file-ico').click()">
+                            <div class="drop-content">
+                                <span class="upload-icon">💎</span>
+                                <p>logo.ico</p>
+                            </div>
+                            <input type="file" id="file-ico" hidden accept=".ico">
+                        </div>
+                    </div>
+
+                    <div class="upload-item" id="drop-gif">
+                        <label>Logo Animada (GIF - Opcional)</label>
+                        <div class="drop-zone" onclick="document.getElementById('file-gif').click()">
+                            <div class="drop-content">
+                                <span class="upload-icon">✨</span>
+                                <p>logo.gif</p>
+                            </div>
+                            <input type="file" id="file-gif" hidden accept=".gif">
+                        </div>
+                    </div>
+                </div>
+
+                <button id="uploadAssets" class="btn-secondary">Sincronizar Arquivos</button>
+            </div>
+        </section>
+
+        <!-- Build Section -->
+        <section class="build-section">
+            <div class="glass-card build-card">
+                <div class="build-info">
+                    <h3>Pronto para Compilar?</h3>
+                    <p>Isso irá atualizar o util.zip, compilar o projeto C# e gerar o pacote final.</p>
+                </div>
+                <button id="startBuild" class="btn-build">
+                    <i class="build-icon">🚀</i>
+                    INICIAR COMPILAÇÃO AUTOMÁTICA
+                </button>
+            </div>
+            
+            <div id="buildStatus" class="build-status hidden">
+                <div class="status-content">
+                    <div class="spinner"></div>
+                    <span id="statusText">Compilando e gerando ZIP...</span>
+                </div>
+                <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+            </div>
+
+            <div id="downloadArea" class="download-area hidden">
+                <div class="success-message">
+                    <span>✨</span> Build Concluído com Sucesso!
+                </div>
+                <a id="downloadBtn" href="#" class="btn-download">Baixar Pacote Final (.zip)</a>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

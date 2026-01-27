@@ -1,0 +1,6 @@
+C:\Users\britto\source\repos\black\black\bin\Release\net9.0-windows\publish\blackScreenTool.exe
+C:\Users\britto\source\repos\black\black\bin\Release\net9.0-windows\publish\blackScreenTool.dll
+C:\Users\britto\source\repos\black\black\bin\Release\net9.0-windows\publish\blackScreenTool.deps.json
+C:\Users\britto\source\repos\black\black\bin\Release\net9.0-windows\publish\blackScreenTool.runtimeconfig.json
+C:\Users\britto\source\repos\black\black\bin\Release\net9.0-windows\publish\blackScreenTool.pdb
+C:\Users\britto\source\repos\black\black\bin\Release\net9.0-windows\publish\WpfAnimatedGif.dll

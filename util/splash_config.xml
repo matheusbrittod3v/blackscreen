@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SplashConfig>
+  <DurationSeconds>5</DurationSeconds>
+  <LogoFile>logo.png</LogoFile>
+  <BackgroundColor>#000000</BackgroundColor>
+  <FadeOut>true</FadeOut>
+</SplashConfig>
