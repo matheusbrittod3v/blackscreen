@@ -1,7 +1,7 @@
 [phases.setup]
-# Usamos o repositório 24.11 do Nix que contém o .NET 9 oficialmente
+# Usamos o repositório 24.11 estável do Nix para garantir o .NET 9 SDK
 nixPkgs = ["nodejs", "dotnet-sdk_9"]
-nixpkgsArchive = "bc42e77bca232edfc1f6b3eec643e99cc1225508"
+nixpkgsArchive = "a1190534c03d527236526702e52e46048d087b7a"
 
 [phases.install]
 cmds = ["cd admin-panel && npm install"]
