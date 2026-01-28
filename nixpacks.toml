@@ -1,11 +1,13 @@
 [phases.setup]
+# Usamos o repositório 24.11 do Nix que contém o .NET 9 oficialmente
 nixPkgs = ["nodejs", "dotnet-sdk_9"]
+nixpkgsArchive = "bc42e77bca232edfc1f6b3eec643e99cc1225508"
 
 [phases.install]
 cmds = ["cd admin-panel && npm install"]
 
 [phases.build]
-cmds = ["echo 'Pulo do gato: Ignorando build de deploy automático, mas mantendo .NET 9 SDK para compilação manual via painel'"]
+cmds = ["echo 'Pulo do gato: Ignorando build automático para permitir compilação manual via painel'"]
 
 [start]
 cmd = "cd admin-panel && node server.js"
