@@ -110,29 +110,29 @@ app.post('/api/build', async (req, res) => {
         console.log('util.zip created.');
 
         // 2. Run dotnet publish
-        // We use -c Release -r win-x64 --self-contained false for smaller binary
-        // or just dotnet publish
-        const publishCmd = 'dotnet publish -c Release';
+        // Forçamos o runtime win-x64 e desativamos o auto-restore para evitar baixar pacotes desnecessários
+        // Também usamos o parâmetro para permitir build windows no linux
+        const publishCmd = 'dotnet publish -c Release -r win-x64 --self-contained false -p:EnableWindowsTargeting=true';
 
         exec(publishCmd, { cwd: projectRoot }, async (error, stdout, stderr) => {
             if (error) {
                 console.error(`exec error: ${error}`);
-                return res.status(500).json({ error: 'Compilation failed', details: stderr });
+                console.log('Build Output:', stdout);
+                return res.status(500).json({ error: 'Falha na compilação. Veja os logs.', details: stderr });
             }
 
-            console.log('Compilation successful.');
+            console.log('Compilação concluída com sucesso.');
 
-            // 3. Find publish directory (usually bin/Release/net9.0-windows/publish)
-            // We might need to adjust this path based on target framework
-            const publishDir = path.join(projectRoot, 'bin', 'Release', 'net9.0-windows', 'publish');
+            // O caminho de saída muda para win-x64/publish quando usamos -r
+            const publishDir = path.join(projectRoot, 'bin', 'Release', 'net9.0-windows', 'win-x64', 'publish');
             const outputZip = path.join(projectRoot, 'dist_output.zip');
 
             if (await fs.pathExists(publishDir)) {
                 await zipFolder(publishDir, outputZip);
-                console.log('Final ZIP created.');
-                res.json({ message: 'Build completed successfully!', downloadUrl: '/api/download' });
+                console.log('ZIP final gerado.');
+                res.json({ message: 'Build concluído! Baixe o seu ZIP abaixo.', downloadUrl: '/api/download' });
             } else {
-                res.status(500).json({ error: 'Publish directory not found' });
+                res.status(500).json({ error: 'Diretório de saída não encontrado: ' + publishDir });
             }
         });
 

@@ -1,14 +1,15 @@
 [phases.setup]
-nixPkgs = ["nodejs"]
+nixPkgs = ["nodejs", "dotnet-sdk_9"]
 
 [phases.install]
 cmds = ["cd admin-panel && npm install"]
 
 [phases.build]
-cmds = ["echo 'Pulo do gato: Ignorando build do .NET no Linux/Dokploy para evitar erros'"]
+cmds = ["echo 'Pulo do gato: Ignorando build de deploy automático, mas mantendo .NET 9 SDK para compilação manual via painel'"]
 
 [start]
 cmd = "cd admin-panel && node server.js"
 
 [variables]
 NODE_ENV = "production"
+DOTNET_CLI_TELEMETRY_OPTOUT = "1"
