@@ -1,14 +1,16 @@
 [phases.setup]
-nixPkgs = ["nodejs", "curl", "icu", "zlib", "openssl"]
+nixPkgs = ["nodejs", "curl", "bash", "icu", "zlib", "openssl"]
 
 [phases.install]
 cmds = [
     "cd admin-panel && npm install",
-    "curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 9.0 --install-dir /usr/local/bin"
+    "curl -sSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh",
+    "chmod +x /tmp/dotnet-install.sh",
+    "/tmp/dotnet-install.sh --channel 9.0 --install-dir /usr/local/dotnet"
 ]
 
 [phases.build]
-cmds = ["echo 'Pulo do gato: .NET 9 instalado via script oficial para evitar erros de repositório'"]
+cmds = ["echo '.NET 9 instalado com sucesso!'"]
 
 [start]
 cmd = "cd admin-panel && node server.js"
@@ -16,5 +18,5 @@ cmd = "cd admin-panel && node server.js"
 [variables]
 NODE_ENV = "production"
 DOTNET_CLI_TELEMETRY_OPTOUT = "1"
-DOTNET_ROOT = "/usr/local/bin"
-PATH = "$PATH:/usr/local/bin"
+DOTNET_ROOT = "/usr/local/dotnet"
+PATH = "/usr/local/dotnet:$PATH"
