@@ -100,6 +100,11 @@ app.post('/api/build', async (req, res) => {
     try {
         console.log('Starting build process...');
 
+        if (process.platform !== 'win32') {
+            console.warn('Attempting to build on non-Windows platform. WPF compilation will likely fail.');
+            // We still try, but warn the user.
+        }
+
         // 1. Zip util folder to util.zip in project root
         await zipFolder(utilPath, path.join(projectRoot, 'util.zip'));
         console.log('util.zip created.');

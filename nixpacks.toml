@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs", "dotnet-sdk_9"]
+nixPkgs = ["nodejs", "dotnet-sdk"]
 
 [phases.install]
 cmds = ["cd admin-panel && npm install"]
