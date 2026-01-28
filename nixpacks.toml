@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs", "curl", "bash", "coreutils", "icu", "zlib", "openssl"]
+nixPkgs = ["nodejs", "curl", "bash", "coreutils", "gawk", "icu", "zlib", "openssl"]
 
 [phases.install]
 cmds = [
