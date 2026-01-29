@@ -4,7 +4,7 @@ const path = require('path');
 const { runMigrations } = require('./infrastructure/database/migrations/runner');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 80;
 
 // Middleware
 app.use(cors());
