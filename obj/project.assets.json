@@ -18,6 +18,24 @@
           "Microsoft.WindowsDesktop.App.WPF"
         ]
       }
+    },
+    "net9.0-windows7.0/win-x64": {
+      "WpfAnimatedGif/2.0.2": {
+        "type": "package",
+        "compile": {
+          "lib/netcoreapp3.0/WpfAnimatedGif.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netcoreapp3.0/WpfAnimatedGif.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "frameworkReferences": [
+          "Microsoft.WindowsDesktop.App.WPF"
+        ]
+      }
     }
   },
   "libraries": {
@@ -117,6 +135,11 @@
           }
         },
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+      }
+    },
+    "runtimes": {
+      "win-x64": {
+        "#import": []
       }
     }
   }

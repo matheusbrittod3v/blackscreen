@@ -66,13 +66,15 @@ const Admin = {
         if (user) {
             title.textContent = 'Editar Cliente';
             document.getElementById('edit-user-id').value = user.id;
-            document.getElementById('user-name').value = user.name;
-            document.getElementById('user-email').value = user.email;
-            document.getElementById('user-role').value = user.role;
-            document.getElementById('user-limit').value = user.monthlyBuildLimit;
-            document.getElementById('user-active').value = user.isActive.toString();
+            document.getElementById('modal-user-name').value = user.name;
+            document.getElementById('modal-user-email').value = user.email;
+            document.getElementById('modal-user-password').value = ''; // Always clear password on edit
+            document.getElementById('modal-user-role').value = user.role;
+            document.getElementById('modal-user-limit').value = user.monthlyBuildLimit;
+            document.getElementById('modal-user-active').value = user.isActive.toString();
         } else {
             title.textContent = 'Novo Cliente';
+            document.getElementById('modal-user-password').value = '';
         }
 
         modal.classList.add('active');
@@ -93,14 +95,16 @@ const Admin = {
             try {
                 const id = document.getElementById('edit-user-id').value;
                 const userData = {
-                    name: document.getElementById('user-name').value,
-                    email: document.getElementById('user-email').value,
-                    role: document.getElementById('user-role').value,
-                    monthlyBuildLimit: parseInt(document.getElementById('user-limit').value),
-                    isActive: document.getElementById('user-active').value === 'true'
+                    name: document.getElementById('modal-user-name').value,
+                    email: document.getElementById('modal-user-email').value,
+                    role: document.getElementById('modal-user-role').value,
+                    monthlyBuildLimit: parseInt(document.getElementById('modal-user-limit').value),
+                    isActive: document.getElementById('modal-user-active').value === 'true'
                 };
 
-                const password = document.getElementById('user-password').value;
+                const password = document.getElementById('modal-user-password').value;
+                console.log('UserData being sent:', userData);
+                console.log('Password length:', password ? password.length : 0);
                 if (password) {
                     userData.password = password;
                 }
@@ -248,7 +252,7 @@ const Admin = {
                         ${this.getActivityIcon(activity.action)}
                     </div>
                     <div class="activity-content">
-                        <span class="activity-title">${activity.userName || 'Sistema'}</span>
+                        <span class="activity-title">${activity.userName || activity.userEmail || 'Sistema'}</span>
                         <span class="activity-description">${activity.description || activity.action}</span>
                     </div>
                     <span class="activity-time">${relativeTime(activity.createdAt)}</span>

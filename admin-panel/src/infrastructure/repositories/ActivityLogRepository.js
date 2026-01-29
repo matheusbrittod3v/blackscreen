@@ -33,7 +33,7 @@ class ActivityLogRepository {
             action: row.action,
             description: row.description,
             ipAddress: row.ip_address,
-            metadata: row.metadata ? JSON.parse(row.metadata) : null,
+            metadata: row.metadata ? (typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata) : null,
             createdAt: row.created_at
         }));
     }
@@ -51,7 +51,7 @@ class ActivityLogRepository {
             action: row.action,
             description: row.description,
             ipAddress: row.ip_address,
-            metadata: row.metadata ? JSON.parse(row.metadata) : null,
+            metadata: row.metadata ? (typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata) : null,
             createdAt: row.created_at
         }));
     }

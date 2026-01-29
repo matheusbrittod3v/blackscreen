@@ -23,13 +23,13 @@ namespace Black
 {
     public class Settings
     {
-        public string CorrectPassword { get; set; } = "123456";
-        public string CustomMessage { get; set; } = "test";
+        public string CorrectPassword { get; set; } = "654321";
+        public string CustomMessage { get; set; } = "how how";
     }
 
     public partial class PasswordWindow : Window
     {
-        private string _correctPassword = "123456";
+        private string _correctPassword = "654321";
         private readonly PasswordBox _passwordInput;
         public PasswordWindow(string correctPassword)
         {

@@ -142,8 +142,13 @@ router.post('/users', async (req, res) => {
 
         res.status(201).json(user.toJSON());
     } catch (error) {
-        console.error('Create user error:', error);
-        res.status(500).json({ error: 'Erro ao criar usuário' });
+        console.error('Create user full error details:', {
+            message: error.message,
+            stack: error.stack,
+            sql: error.sql,
+            code: error.code
+        });
+        res.status(500).json({ error: 'Erro ao criar usuário', details: error.message });
     }
 });
 
