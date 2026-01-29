@@ -45,9 +45,11 @@ const Build = {
     },
 
     setupSettingsForm() {
+        const settingsForm = document.getElementById('settings-form');
         const saveBtn = document.getElementById('saveSettings');
 
-        saveBtn.addEventListener('click', async () => {
+        settingsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             saveBtn.classList.add('loading');
 
             try {
@@ -122,13 +124,13 @@ const Build = {
             statusText.textContent = 'Iniciando build...';
 
             try {
-                // Simulate progress
                 const timer = setInterval(() => {
                     const currentWidth = parseInt(progressFill.style.width);
-                    if (currentWidth < 90) {
-                        progressFill.style.width = (currentWidth + 10) + '%';
+                    if (currentWidth < 95) {
+                        const increment = Math.max(1, Math.floor((100 - currentWidth) / 10));
+                        progressFill.style.width = (currentWidth + increment) + '%';
                     }
-                }, 3000);
+                }, 500);
 
                 const data = await API.post('/api/build/build', {});
 
@@ -137,7 +139,8 @@ const Build = {
                 statusText.textContent = 'Build concluído!';
 
                 downloadArea.classList.remove('hidden');
-                document.getElementById('downloadBtn').href = data.downloadUrl;
+                const downloadUrl = `${data.downloadUrl}?token=${API.token}`;
+                document.getElementById('downloadBtn').href = downloadUrl;
 
                 showToast('Build concluído com sucesso!', 'success');
                 this.loadBuildLimit();

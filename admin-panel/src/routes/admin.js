@@ -49,8 +49,13 @@ router.get('/dashboard', async (req, res) => {
             userBuildStats
         });
     } catch (error) {
-        console.error('Dashboard error:', error);
-        res.status(500).json({ error: 'Erro ao carregar dashboard' });
+        console.error('Dashboard full error details:', {
+            message: error.message,
+            stack: error.stack,
+            sql: error.sql,
+            code: error.code
+        });
+        res.status(500).json({ error: 'Erro ao carregar dashboard', details: error.message });
     }
 });
 
@@ -72,8 +77,13 @@ router.get('/users', async (req, res) => {
 
         res.json(usersWithStats);
     } catch (error) {
-        console.error('Get users error:', error);
-        res.status(500).json({ error: 'Erro ao listar usuários' });
+        console.error('Get users full error details:', {
+            message: error.message,
+            stack: error.stack,
+            sql: error.sql,
+            code: error.code
+        });
+        res.status(500).json({ error: 'Erro ao listar usuários', details: error.message });
     }
 });
 
