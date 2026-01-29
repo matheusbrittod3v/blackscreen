@@ -1,21 +1,18 @@
-# Usamos Node para o Painel
-FROM node:18
-
-# Instalar SDK do .NET (Isso funciona no Linux, mas NÃO compila WPF para Windows)
-RUN apt-get update && apt-get install -y dotnet-sdk-9.0
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copia arquivos do painel
-COPY admin-panel/package*.json ./
-RUN npm install
+# Copy package files
+COPY package*.json ./
 
-# Copia todo o projeto (para as fontes C# estarem disponíveis)
-WORKDIR /src
+# Install dependencies
+RUN npm install --production
+
+# Copy application code
 COPY . .
 
-# Volta para a pasta do painel
-WORKDIR /src/admin-panel
-
+# Expose port
 EXPOSE 3000
-CMD ["node", "server.js"]
+
+# Start the application
+CMD ["node", "src/server.js"]
