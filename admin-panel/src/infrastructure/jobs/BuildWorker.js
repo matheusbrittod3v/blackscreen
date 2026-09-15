@@ -109,8 +109,8 @@ class BuildWorker {
                 await fs.writeFile(mainWinPath, content, 'utf8');
             }
 
-            // 5. Run dotnet publish
-            const publishCmd = `dotnet publish "${csprojPath}" -c Release -r win-x64 --self-contained false -p:EnableWindowsTargeting=true`;
+            // 5. Run dotnet publish (Self-Contained Single-File build: zero .NET installation required on client PC)
+            const publishCmd = `dotnet publish "${csprojPath}" -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableWindowsTargeting=true`;
 
             await new Promise((resolve, reject) => {
                 exec(publishCmd, { cwd: projectRoot }, async (error, stdout, stderr) => {
