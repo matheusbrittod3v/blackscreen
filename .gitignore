@@ -1,0 +1,23 @@
+# Build output directories
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Generated ZIP outputs and temporary user storage
+dist_output.zip
+util.zip
+storage/
+
+# Node.js dependencies and logs
+node_modules/
+admin-panel/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System files
+.DS_Store
+Thumbs.db
