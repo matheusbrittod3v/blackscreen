@@ -161,7 +161,7 @@ class DashboardComponent {
                                         </div>
                                     </div>
                                     <div class="upload-item">
-                                        <label>Ícone Executável (ICO)</label>
+                                        <label>Ícone Executável (ICO) <span style="font-size:0.7rem;color:var(--text-muted);">(ou gerado do PNG)</span></label>
                                         <div class="drop-zone" onclick="document.getElementById('file-ico').click()">
                                             <div class="drop-content">
                                                 <span class="upload-icon">💎</span>
@@ -181,7 +181,10 @@ class DashboardComponent {
                                         </div>
                                     </div>
                                 </div>
-                                <button id="uploadAssets" class="btn-secondary">Sincronizar Arquivos</button>
+                                <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+                                    <button id="uploadAssets" class="btn-secondary" style="flex:1;">Sincronizar Arquivos</button>
+                                    <button id="convertPngToIco" type="button" class="btn-secondary" style="flex:1;background:rgba(108,92,231,0.2);border-color:rgba(108,92,231,0.4);" title="Converte automaticamente seu logo.png em logo.ico">⚡ Converter PNG &rarr; ICO</button>
+                                </div>
                             </div>
                         </div>
                         <div class="glass-card build-card">

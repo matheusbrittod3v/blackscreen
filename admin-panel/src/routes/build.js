@@ -3,6 +3,7 @@ const multer = require('multer');
 const archiver = require('archiver');
 const fs = require('fs-extra');
 const path = require('path');
+const pngToIco = require('png-to-ico');
 const router = express.Router();
 const { authMiddleware } = require('../middleware/auth');
 const buildRepository = require('../infrastructure/repositories/BuildRepository');
@@ -33,6 +34,19 @@ async function ensureUserStorage(userId) {
         const globalFilePath = path.join(globalUtilPath, file);
         if (!(await fs.pathExists(userFilePath)) && (await fs.pathExists(globalFilePath))) {
             await fs.copy(globalFilePath, userFilePath);
+        }
+    }
+
+    // Auto-generate logo.ico from logo.png if missing
+    const userIcoPath = path.join(userUtil, 'logo.ico');
+    const userPngPath = path.join(userUtil, 'logo.png');
+    if (!(await fs.pathExists(userIcoPath)) && (await fs.pathExists(userPngPath))) {
+        try {
+            const buf = await pngToIco(userPngPath);
+            await fs.writeFile(userIcoPath, buf);
+            console.log(`[ensureUserStorage] Auto-generated logo.ico from logo.png for user #${userId}`);
+        } catch (e) {
+            console.error(`[ensureUserStorage] Failed to auto-generate ICO for user #${userId}:`, e.message);
         }
     }
 
@@ -126,12 +140,49 @@ router.post('/upload', upload.fields([
         if (req.files['logo_ico']) updates.logoIco = 'logo.ico';
         if (req.files['logo_gif']) updates.logoGif = 'logo.gif';
 
+        const { userUtil } = await ensureUserStorage(req.user.id);
+
+        // If user uploaded a new PNG but did not upload an ICO, automatically generate logo.ico from the PNG!
+        if (req.files['logo_png'] && !req.files['logo_ico']) {
+            try {
+                const userPngPath = path.join(userUtil, 'logo.png');
+                const userIcoPath = path.join(userUtil, 'logo.ico');
+                const buf = await pngToIco(userPngPath);
+                await fs.writeFile(userIcoPath, buf);
+                updates.logoIco = 'logo.ico';
+            } catch (convErr) {
+                console.error('Upload auto png-to-ico conversion failed:', convErr);
+            }
+        }
+
         await userSettingsRepository.upsert(req.user.id, updates);
 
         res.json({ message: 'Arquivos personalizados enviados com sucesso para sua conta!' });
     } catch (err) {
         console.error('Upload error:', err);
         res.status(500).json({ error: 'Erro ao processar arquivos' });
+    }
+});
+
+// Explicit PNG to ICO Conversion Route
+router.post('/convert-png-to-ico', async (req, res) => {
+    try {
+        const { userUtil } = await ensureUserStorage(req.user.id);
+        const userPngPath = path.join(userUtil, 'logo.png');
+        const userIcoPath = path.join(userUtil, 'logo.ico');
+
+        if (!(await fs.pathExists(userPngPath))) {
+            return res.status(404).json({ error: 'Nenhum arquivo logo.png encontrado em sua conta.' });
+        }
+
+        const buf = await pngToIco(userPngPath);
+        await fs.writeFile(userIcoPath, buf);
+        await userSettingsRepository.upsert(req.user.id, { logoIco: 'logo.ico' });
+
+        res.json({ message: '✨ Ícone (.ico) gerado do seu PNG com sucesso!' });
+    } catch (err) {
+        console.error('PNG to ICO conversion route error:', err);
+        res.status(500).json({ error: 'Erro ao converter PNG para ICO: ' + err.message });
     }
 });
 

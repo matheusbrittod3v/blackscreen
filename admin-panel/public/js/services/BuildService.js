@@ -97,9 +97,9 @@ class BuildService {
                 if (!pngFile && !icoFile && !gifFile) return Utils.showToast('Selecione ao menos um arquivo para enviar.', 'error');
                 uploadBtn.disabled = true;
                 const formData = new FormData();
-                if (pngFile) formData.append('png', pngFile);
-                if (icoFile) formData.append('ico', icoFile);
-                if (gifFile) formData.append('gif', gifFile);
+                if (pngFile) formData.append('logo_png', pngFile);
+                if (icoFile) formData.append('logo_ico', icoFile);
+                if (gifFile) formData.append('logo_gif', gifFile);
 
                 try {
                     const result = await API.upload('/api/build/upload', formData);
@@ -108,6 +108,22 @@ class BuildService {
                     Utils.showToast(error.message, 'error');
                 } finally {
                     uploadBtn.disabled = false;
+                }
+            });
+        }
+
+        const convertBtn = document.getElementById('convertPngToIco');
+        if (convertBtn) {
+            convertBtn.addEventListener('click', async () => {
+                convertBtn.disabled = true;
+                Utils.showToast('⚙️ Convertendo PNG para Ícone (.ico)... Aguarde.', 'info');
+                try {
+                    const result = await API.post('/api/build/convert-png-to-ico', {});
+                    Utils.showToast(result.message || '✨ Ícone (.ico) gerado com sucesso!', 'success');
+                } catch (error) {
+                    Utils.showToast(error.message, 'error');
+                } finally {
+                    convertBtn.disabled = false;
                 }
             });
         }
