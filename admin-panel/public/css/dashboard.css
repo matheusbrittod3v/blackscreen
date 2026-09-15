@@ -4,6 +4,8 @@
 #dashboard-view {
     display: none;
     min-height: 100vh;
+    position: relative;
+    z-index: 1;
 }
 
 #dashboard-view.active {

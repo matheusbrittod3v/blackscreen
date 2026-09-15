@@ -24,8 +24,8 @@ const App = {
         const landing = document.getElementById('landing-view');
         const dashboard = document.getElementById('dashboard-view');
 
-        if (landing) { landing.classList.add('active'); landing.style.display = 'block'; }
-        if (dashboard) { dashboard.classList.remove('active'); dashboard.style.display = 'none'; }
+        if (landing) { landing.classList.add('active'); landing.removeAttribute('style'); }
+        if (dashboard) { dashboard.classList.remove('active'); dashboard.removeAttribute('style'); }
 
         this.closeAuthModal();
 
@@ -72,8 +72,8 @@ const App = {
         const landing = document.getElementById('landing-view');
         const dashboard = document.getElementById('dashboard-view');
 
-        if (landing) { landing.classList.remove('active'); landing.style.display = 'none'; }
-        if (dashboard) { dashboard.classList.add('active'); dashboard.style.display = 'block'; }
+        if (landing) { landing.classList.remove('active'); landing.removeAttribute('style'); }
+        if (dashboard) { dashboard.classList.add('active'); dashboard.removeAttribute('style'); }
 
         this.closeAuthModal();
 
