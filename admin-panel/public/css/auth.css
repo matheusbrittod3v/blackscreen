@@ -282,11 +282,11 @@
 
 /* Forms */
 .auth-form {
-    display: none;
+    display: none !important;
 }
 
 .auth-form.active {
-    display: block;
+    display: block !important;
     animation: fadeInForm 0.35s ease-out;
 }
 

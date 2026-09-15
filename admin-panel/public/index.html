@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlackTool - Painel de Controle</title>
-    <meta name="description" content="BlackTool - Sistema de build automatizado com painel administrativo">
+    <title>BlackScreen Tool - Tela Preta & Desktop Virtual para Unlockers</title>
+    <meta name="description" content="BlackScreen Tool - Crie áreas de trabalho virtuais, escureça a tela do cliente com mensagem personalizada e logo animado para atendimentos de unlock com total sigilo.">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/landing.css">
     <link rel="stylesheet" href="css/auth.css">
@@ -34,18 +34,18 @@
                     <div class="landing-brand" onclick="App.showLanding()">
                         <div class="logo-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                                <path d="M2 17l10 5 10-5"></path>
-                                <path d="M2 12l10 5 10-5"></path>
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                <line x1="8" y1="21" x2="16" y2="21"></line>
+                                <line x1="12" y1="17" x2="12" y2="21"></line>
                             </svg>
                         </div>
-                        <span>Black<span class="gradient-text">Tool</span></span>
+                        <span>BlackScreen<span class="gradient-text">Tool</span> <span style="font-size:0.65rem;background:rgba(108,92,231,0.25);border:1px solid rgba(108,92,231,0.4);padding:2px 6px;border-radius:4px;color:var(--primary-light);vertical-align:middle;margin-left:4px;">FOR UNLOCKERS</span></span>
                     </div>
 
                     <ul class="landing-links">
-                        <li><a href="#features">Recursos</a></li>
+                        <li><a href="#features">Recursos Unlocker</a></li>
                         <li><a href="#how-it-works">Como Funciona</a></li>
-                        <li><a href="#status-section">Operação</a></li>
+                        <li><a href="#security-unlock">Segurança & Sigilo</a></li>
                     </ul>
 
                     <div class="landing-nav-actions" id="landing-nav-auth-buttons">
@@ -58,21 +58,21 @@
                 <section class="landing-hero">
                     <div class="hero-pill">
                         <span class="dot"></span>
-                        <span>v2.0 Multi-Tenant Pro • Ambiente 100% Isolado por Usuário</span>
+                        <span>A Ferramenta Definitiva para Técnicos e Unlockers Remotos</span>
                     </div>
 
                     <h1 class="hero-title">
-                        Construa, Personalize e Distribua o <br>
-                        <span class="gradient-text">Black Screen Tool</span> com 1 Clique
+                        Escureça a Tela do Cliente e Trabalhe em uma <br>
+                        <span class="gradient-text">Área de Trabalho Virtual</span> com Sigilo Absoluto
                     </h1>
 
                     <p class="hero-description">
-                        Plataforma de alta performance com compilação nativa em .NET 9. Cada usuário possui configurações, senhas, logos e downloads totalmente isolados na sua própria conta segura.
+                        O <strong>Black Screen Tool</strong> foi desenvolvido especialmente para unlockers realizarem procedimentos remotos (FRP, iCloud, MDM, Xiaomi, Flashing). Crie um desktop virtual secreto, escureça o monitor do cliente e exiba sua mensagem e logo animada enquanto você opera suas ferramentas protegido de olhares curiosos.
                     </p>
 
                     <div class="hero-actions">
                         <button class="btn-hero-primary" onclick="App.showAuth('register')">
-                            <span>Começar Agora Gratuitamente</span>
+                            <span>Criar Meu Executável Personalizado</span>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                                 <polyline points="12 5 19 12 12 19"></polyline>
@@ -84,7 +84,7 @@
                                 <polyline points="10 17 15 12 10 7"></polyline>
                                 <line x1="15" y1="12" x2="3" y2="12"></line>
                             </svg>
-                            <span>Acessar Minha Conta</span>
+                            <span>Acessar Painel do Unlocker</span>
                         </button>
                     </div>
 
@@ -92,29 +92,35 @@
                     <div class="hero-badges">
                         <div class="hero-badge-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="9" y1="3" x2="9" y2="21"></line>
                             </svg>
-                            <span>Multi-Usuários 100% Isolados</span>
+                            <span>Área de Trabalho Virtual Isolada</span>
                         </div>
                         <div class="hero-badge-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
                             </svg>
-                            <span>Compilador .NET 9 Nativo</span>
+                            <span>Tela Preta (Blackout) no Cliente</span>
                         </div>
                         <div class="hero-badge-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                             </svg>
-                            <span>Downloads Privados Protegidos</span>
+                            <span>Logo & GIF Animado Personalizado</span>
+                        </div>
+                        <div class="hero-badge-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            <span>Destravamento por Senha Master</span>
                         </div>
                     </div>
 
-                    <!-- Mockup Card -->
-                    <div class="hero-mockup-wrapper">
+                    <!-- Mockup Card: Client Blackout vs Unlocker Virtual Desktop -->
+                    <div class="hero-mockup-wrapper" id="security-unlock">
                         <div class="hero-mockup-card">
                             <div class="mockup-header">
                                 <div class="mockup-dots">
@@ -122,53 +128,61 @@
                                     <div class="mockup-dot yellow"></div>
                                     <div class="mockup-dot green"></div>
                                 </div>
-                                <span class="mockup-title">BlackTool Studio Cloud Pipeline</span>
-                                <span class="mockup-badge">ONLINE</span>
+                                <span class="mockup-title">Visão Comparativa em Tempo Real: Cliente vs Unlocker</span>
+                                <span class="mockup-badge">MODO UNLOCK ATIVO</span>
                             </div>
                             <div class="mockup-content">
-                                <div class="mockup-pane">
-                                    <h4>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <rect x="3" y="3" width="7" height="9"></rect>
-                                            <rect x="14" y="3" width="7" height="5"></rect>
-                                            <rect x="14" y="12" width="7" height="9"></rect>
+                                <!-- Coluna 1: O que o cliente vê (Tela Preta) -->
+                                <div class="mockup-pane" style="background:#000000;border:1px solid rgba(255,255,255,0.12);text-align:center;padding:24px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                                    <div style="font-size:0.75rem;color:var(--danger);text-transform:uppercase;font-weight:700;letter-spacing:1px;margin-bottom:12px;background:rgba(239,68,68,0.15);padding:3px 10px;border-radius:4px;">
+                                        👁️ O que o Cliente Vê no Monitor
+                                    </div>
+                                    
+                                    <!-- Logo e Animação do Unlocker simulados -->
+                                    <div style="width:54px;height:54px;background:linear-gradient(135deg,#6c5ce7,#fd79a8);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;box-shadow:0 0 25px rgba(108,92,231,0.6);">
+                                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+                                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                            <polyline points="2 17 12 22 22 17"></polyline>
+                                            <polyline points="2 12 12 17 22 12"></polyline>
                                         </svg>
-                                        Painel de Métricas Isoladas
-                                    </h4>
-                                    <div class="mockup-stat-grid">
-                                        <div class="mockup-stat-box">
-                                            <div class="label">Quota Mensal</div>
-                                            <div class="value">5 / 5 Disponíveis</div>
-                                        </div>
-                                        <div class="mockup-stat-box">
-                                            <div class="label">Storage Privativo</div>
-                                            <div class="value" style="color:var(--accent-green)">storage/users/id</div>
-                                        </div>
-                                        <div class="mockup-stat-box">
-                                            <div class="label">Tempo Médio</div>
-                                            <div class="value">~3.5s</div>
-                                        </div>
-                                        <div class="mockup-stat-box">
-                                            <div class="label">Sistema Alvo</div>
-                                            <div class="value">Win-x64 Release</div>
-                                        </div>
+                                    </div>
+                                    <div style="font-size:0.7rem;color:var(--accent-cyan);font-weight:700;letter-spacing:0.5px;margin-bottom:8px;">
+                                        ⚡ SEU LOGO & GIF ANIMADO AQUI
+                                    </div>
+
+                                    <!-- Mensagem personalizada para o cliente -->
+                                    <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px;margin:8px 0;width:90%;">
+                                        <p style="font-size:0.82rem;font-weight:600;color:#fff;margin:0 0 4px;">
+                                            &ldquo;Procedimento técnico em andamento. Aguarde...&rdquo;
+                                        </p>
+                                        <p style="font-size:0.72rem;color:#f87171;margin:0;">
+                                            ⚠️ Não mexa no mouse nem desconecte o cabo USB!
+                                        </p>
+                                    </div>
+                                    
+                                    <div style="font-size:0.68rem;color:var(--text-muted);margin-top:6px;">
+                                        🔒 Teclado e Mouse do cliente inoperantes. Bloqueado com sua Senha.
                                     </div>
                                 </div>
-                                <div class="mockup-pane">
-                                    <h4>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="4 17 10 11 4 5"></polyline>
-                                            <line x1="12" y1="19" x2="20" y2="19"></line>
-                                        </svg>
-                                        Terminal de Build em Tempo Real
-                                    </h4>
-                                    <div class="mockup-terminal">
-                                        <span class="t-purple">&gt; dotnet publish</span> -c Release -r win-x64<br>
-                                        <span class="t-cyan">&gt; Carregando credenciais isoladas do usuário...</span><br>
-                                        <span class="t-cyan">&gt; Sincronizando assets privativos (PNG, ICO, GIF)...</span><br>
-                                        <span class="t-green">&#10004; Compilação concluída com sucesso!</span><br>
-                                        <span class="t-green">&#10004; Pacote .zip gerado no storage exclusivo do usuário.</span><br>
-                                        <span class="t-purple">&gt; Download autenticado pronto para distribuição.</span>
+
+                                <!-- Coluna 2: O que o Unlocker opera (Área Virtual Secreta) -->
+                                <div class="mockup-pane" style="background:#0d1117;border:1px solid rgba(108,92,231,0.3);padding:20px;">
+                                    <div style="font-size:0.75rem;color:var(--accent-green);text-transform:uppercase;font-weight:700;letter-spacing:1px;margin-bottom:12px;background:rgba(39,201,63,0.15);padding:3px 10px;border-radius:4px;display:inline-block;">
+                                        🤫 Sua Área Virtual Secreta (Invisível)
+                                    </div>
+                                    
+                                    <div class="mockup-terminal" style="font-size:0.78rem;line-height:1.7;">
+                                        <span class="t-purple">&gt; Desktop Virtual #2 Criado</span> [Isolamento 100%]<br>
+                                        <span class="t-green">&#10004; Tela do cliente: Blackout Ativo</span><br>
+                                        <span class="t-cyan">&gt; Executando UnlockTool / Chimera / Pandora...</span><br>
+                                        <span class="t-cyan">&gt; Porta COM3 (Qualcomm EDL 9008): Conectada</span><br>
+                                        <span class="t-green">&#10004; Bypass FRP / MDM: 100% Concluído</span><br>
+                                        <span class="t-purple">&gt; Digite sua senha master para restaurar a tela.</span>
+                                    </div>
+
+                                    <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;">
+                                        <span style="font-size:0.72rem;color:var(--text-muted);">Suas senhas, dongles e créditos protegidos</span>
+                                        <span style="font-size:0.7rem;font-weight:700;color:var(--accent-green);">SIGILO TOTAL</span>
                                     </div>
                                 </div>
                             </div>
@@ -176,22 +190,66 @@
                     </div>
                 </section>
 
-                <!-- Features Section -->
+                <!-- Features Section: Especificamente para Unlockers -->
                 <section id="features" class="landing-features">
                     <div class="section-header">
-                        <h2>Arquitetura Multi-Tenant Isolada</h2>
-                        <p>Total privacidade para suas credenciais, personalizações visuais e arquivos de compilação.</p>
+                        <h2>Recursos Criados Exclusivamente para Unlockers</h2>
+                        <p>Tudo o que você precisa para prestar suporte remoto profissional, proteger seus métodos e manter o cliente sob controle durante o serviço.</p>
                     </div>
 
                     <div class="features-grid">
                         <div class="feature-card">
                             <div class="feature-icon-wrapper">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                                    <line x1="12" y1="17" x2="12" y2="21"></line>
                                 </svg>
                             </div>
-                            <h3>Multi-Usuários 100% Isolados</h3>
-                            <p>Cada conta tem sua própria base de configurações, senha de desbloqueio, mensagem na tela e pasta de arquivos sem interferência entre contas.</p>
+                            <h3>Áreas de Trabalho Virtuais</h3>
+                            <p>Crie um desktop Windows virtual em segundo plano. Opere suas ferramentas de desbloqueio sem que o cliente veja seus arquivos, licenças de dongles ou créditos de servidor.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                                </svg>
+                            </div>
+                            <h3>Blackout (Tela Preta) no Cliente</h3>
+                            <p>Escurece completamente o monitor do cliente durante o atendimento via AnyDesk ou TeamViewer, evitando que ele clique, feche janelas ou interrompa o processo.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                            </div>
+                            <h3>Mensagem Personalizada na Tela</h3>
+                            <p>Exiba orientações personalizadas na tela preta do cliente, como alertas de segurança: <em>&ldquo;Aguarde, procedimento técnico em andamento. Não desconecte o cabo USB!&rdquo;</em>.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                </svg>
+                            </div>
+                            <h3>Logo e GIF Animado do Servidor</h3>
+                            <p>Carregue a identidade visual do seu servidor ou assistência: logo PNG transparente, ícone do executável (.ico) e animação GIF personalizada em alta resolução.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </div>
+                            <h3>Senha Master de Desbloqueio</h3>
+                            <p>Apenas quem tem sua senha master consegue restaurar a tela do cliente. Ao finalizar o bypass ou gravação de software, destranque a tela em 1 segundo.</p>
                         </div>
 
                         <div class="feature-card">
@@ -202,80 +260,34 @@
                                     <polyline points="2 12 12 17 22 12"></polyline>
                                 </svg>
                             </div>
-                            <h3>Compilador Nativo .NET 9</h3>
-                            <p>Executáveis Windows de alto desempenho gerados diretamente na nuvem em contêineres otimizados e prontos para distribuição.</p>
-                        </div>
-
-                        <div class="feature-card">
-                            <div class="feature-icon-wrapper">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                    <polyline points="21 15 16 10 5 21"></polyline>
-                                </svg>
-                            </div>
-                            <h3>Assets & Marcas Privativas</h3>
-                            <p>Envie logotipos transparentes (PNG), ícones de executável (.ICO) e logos animadas (.GIF) vinculadas estritamente ao seu perfil.</p>
-                        </div>
-
-                        <div class="feature-card">
-                            <div class="feature-icon-wrapper">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                </svg>
-                            </div>
-                            <h3>Segurança Criptografada JWT</h3>
-                            <p>Tokens com assinatura segura e expiração controlada. Proteção contra acessos não autorizados ou downloads cruzados.</p>
-                        </div>
-
-                        <div class="feature-card">
-                            <div class="feature-icon-wrapper">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <polyline points="12 6 12 12 16 14"></polyline>
-                                </svg>
-                            </div>
-                            <h3>Histórico & Re-Download Direto</h3>
-                            <p>Acesse a qualquer instante todos os builds gerados pela sua conta com link direto de download do arquivo ZIP compilado.</p>
-                        </div>
-
-                        <div class="feature-card">
-                            <div class="feature-icon-wrapper">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                </svg>
-                            </div>
-                            <h3>Painel Administrativo Completo</h3>
-                            <p>Visão global para administradores com logs de auditoria detalhados, controle de cotas de compilação e gestão de membros.</p>
+                            <h3>Compilação em Nuvem em 1 Clique</h3>
+                            <p>Não instale compiladores pesados no seu PC. Nosso servidor .NET 9 gera seu pacote ZIP com o BlackScreenTool.exe configurado e pronto para download imediato.</p>
                         </div>
                     </div>
                 </section>
 
-                <!-- How It Works Section -->
+                <!-- How It Works Section: Fluxo do Unlocker -->
                 <section id="how-it-works" class="landing-steps">
                     <div class="section-header">
-                        <h2>Como Funciona</h2>
-                        <p>Três passos simples para gerar e distribuir sua versão customizada.</p>
+                        <h2>Como Funciona no seu Dia a Dia de Unlocker</h2>
+                        <p>O fluxo de trabalho mais rápido e seguro para seus atendimentos remotos.</p>
                     </div>
 
                     <div class="steps-grid">
                         <div class="step-card">
                             <div class="step-number">1</div>
-                            <h3>Configure os Dados</h3>
-                            <p>Defina a senha correta de desbloqueio e a mensagem personalizada exibida no aplicativo.</p>
+                            <h3>Configure sua Marca & Senha</h3>
+                            <p>No painel web, defina sua senha master de desbloqueio, digite a mensagem para o cliente e envie sua logo PNG e GIF animado.</p>
                         </div>
                         <div class="step-card">
                             <div class="step-number">2</div>
-                            <h3>Envie sua Identidade</h3>
-                            <p>Faça upload de logos PNG, ícones .ico e GIFs para seu armazenamento privativo.</p>
+                            <h3>Gere seu Executável Único</h3>
+                            <p>Clique em Iniciar Compilação. Em poucos segundos o servidor compila seu BlackScreenTool.exe customizado para você baixar.</p>
                         </div>
                         <div class="step-card">
                             <div class="step-number">3</div>
-                            <h3>Gere & Distribua</h3>
-                            <p>Inicie a compilação e receba o ZIP final com o executável pronto para uso.</p>
+                            <h3>Execute no Cliente com Sigilo</h3>
+                            <p>Abra no PC do cliente durante o AnyDesk. A tela escurece com sua marca, seu desktop virtual se abre e você trabalha com 100% de sigilo.</p>
                         </div>
                     </div>
                 </section>
@@ -283,10 +295,10 @@
                 <!-- CTA Banner -->
                 <section class="landing-cta" id="status-section">
                     <div class="cta-box">
-                        <h2>Pronto para criar seu primeiro build?</h2>
-                        <p>Cadastre-se gratuitamente e aproveite o painel de compilação automatizada com segurança total.</p>
+                        <h2>Leve seus Atendimentos de Unlocker ao Nível Profissional</h2>
+                        <p>Cadastre-se gratuitamente no BlackScreen Tool e tenha seu próprio software de tela preta e desktop virtual com a identidade do seu serviço.</p>
                         <button class="btn-hero-primary" onclick="App.showAuth('register')">
-                            <span>Criar Minha Conta Grátis</span>
+                            <span>Criar Minha Conta de Unlocker</span>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                                 <polyline points="12 5 19 12 12 19"></polyline>
@@ -300,17 +312,17 @@
                     <div class="footer-brand">
                         <div class="logo-icon" style="width:28px;height:28px;border-radius:6px;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                                <path d="M2 17l10 5 10-5"></path>
-                                <path d="M2 12l10 5 10-5"></path>
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                <line x1="8" y1="21" x2="16" y2="21"></line>
+                                <line x1="12" y1="17" x2="12" y2="21"></line>
                             </svg>
                         </div>
-                        <span>BlackTool &copy; 2026. Todos os direitos reservados.</span>
+                        <span>BlackScreen Tool &bull; A ferramenta essencial para Unlockers &copy; 2026. blackscreentool.com.br</span>
                     </div>
 
                     <div class="footer-status">
                         <span class="dot"></span>
-                        <span>Serviço Online em 0.0.0.0 • .NET 9 SDK Operacional</span>
+                        <span>Servidor Online em 0.0.0.0 &bull; Compilador .NET 9 Pronto</span>
                     </div>
                 </footer>
             </div>
@@ -320,7 +332,7 @@
         <div id="auth-view" class="view">
             <div class="auth-container">
                 <div class="auth-split-card">
-                    <!-- Left Column: Showcase & Brand -->
+                    <!-- Left Column: Showcase & Brand Especializado para Unlocker -->
                     <div class="auth-showcase-panel">
                         <button class="auth-back-link" onclick="App.showLanding()">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -334,15 +346,15 @@
                             <div class="showcase-brand">
                                 <div class="logo-icon">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                                        <path d="M2 17l10 5 10-5"></path>
-                                        <path d="M2 12l10 5 10-5"></path>
+                                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                                        <line x1="12" y1="17" x2="12" y2="21"></line>
                                     </svg>
                                 </div>
-                                <h2>Black<span class="gradient-text">Tool</span></h2>
+                                <h2>BlackScreen<span class="gradient-text">Tool</span></h2>
                             </div>
                             <p class="showcase-tagline">
-                                Painel de Compilação & Automação com Isolamento Multi-Usuário.
+                                Painel de Compilação & Customização de Tela Preta e Áreas de Trabalho Virtuais para Unlockers.
                             </p>
 
                             <ul class="showcase-features">
@@ -353,8 +365,8 @@
                                         </svg>
                                     </div>
                                     <div class="feature-text">
-                                        <strong>Espaço 100% Isolado</strong>
-                                        <span>Suas senhas, mensagens e logos ficam privativos na sua conta</span>
+                                        <strong>Área de Trabalho Virtual Oculta</strong>
+                                        <span>Opere suas ferramentas e dongles sem que o cliente veja seus procedimentos</span>
                                     </div>
                                 </li>
                                 <li class="showcase-feature-item">
@@ -364,8 +376,8 @@
                                         </svg>
                                     </div>
                                     <div class="feature-text">
-                                        <strong>Compilação .NET 9 em Nuvem</strong>
-                                        <span>Builds instantâneos com injeção automática de parâmetros</span>
+                                        <strong>Tela Preta com Logo e GIF Animado</strong>
+                                        <span>Exiba sua marca e mensagem personalizada na tela do cliente durante o serviço</span>
                                     </div>
                                 </li>
                                 <li class="showcase-feature-item">
@@ -375,8 +387,8 @@
                                         </svg>
                                     </div>
                                     <div class="feature-text">
-                                        <strong>Downloads Protegidos</strong>
-                                        <span>Histórico persistente e links de download autenticados</span>
+                                        <strong>Bloqueio Seguro com Senha Master</strong>
+                                        <span>O cliente não consegue mexer no PC até que você digite a senha de liberação</span>
                                     </div>
                                 </li>
                             </ul>
@@ -392,8 +404,8 @@
                                     </svg>
                                 </div>
                                 <div class="mini-card-text">
-                                    <div class="title">Status do Servidor</div>
-                                    <div class="sub">Compilador Ativo • 0.0.0.0</div>
+                                    <div class="title">Modo Unlocker Ativo</div>
+                                    <div class="sub">Compilador .NET 9 • blackscreentool.com.br</div>
                                 </div>
                             </div>
                             <span class="mini-card-badge">OPERACIONAL</span>

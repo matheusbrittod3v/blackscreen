@@ -469,12 +469,12 @@ select {
    VIEWS
    ============================================ */
 .view {
-    display: none;
+    display: none !important;
     min-height: 100vh;
 }
 
 .view.active {
-    display: block;
+    display: block !important;
 }
 
 /* ============================================
