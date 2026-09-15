@@ -1,5 +1,6 @@
 /**
  * Admin Module - Client & Audit Management Panel
+ * Protected by server-side JWT verification and strict client-side guards
  */
 const Admin = {
     init() {
@@ -8,12 +9,21 @@ const Admin = {
         this.setupUserForm();
     },
 
+    isAdmin() {
+        return Auth.currentUser && Auth.currentUser.role === 'admin';
+    },
+
     setupTabs() {
         const tabs = document.querySelectorAll('.admin-tab');
         const contents = document.querySelectorAll('.admin-tab-content');
 
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
+                if (!this.isAdmin()) {
+                    Utils.showToast('Acesso negado: Requer privilégios de administrador.', 'error');
+                    return;
+                }
+
                 const target = tab.dataset.adminTab;
 
                 tabs.forEach(t => t.classList.remove('active'));
@@ -48,6 +58,7 @@ const Admin = {
 
         if (addBtn) {
             addBtn.addEventListener('click', () => {
+                if (!this.isAdmin()) return;
                 this.openModal();
             });
         }
@@ -62,6 +73,11 @@ const Admin = {
     },
 
     openModal(user = null) {
+        if (!this.isAdmin()) {
+            Utils.showToast('Acesso negado: Requer privilégios de administrador.', 'error');
+            return;
+        }
+
         const modal = document.getElementById('user-modal');
         if (!modal) return;
         const title = document.getElementById('modal-title');
@@ -107,6 +123,11 @@ const Admin = {
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!this.isAdmin()) {
+                Utils.showToast('Acesso negado: Apenas administradores podem gerenciar usuários.', 'error');
+                return;
+            }
+
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) submitBtn.disabled = true;
 
@@ -143,7 +164,7 @@ const Admin = {
     },
 
     async loadDashboard() {
-        if (Auth.currentUser?.role !== 'admin') return;
+        if (!this.isAdmin()) return;
 
         try {
             const stats = await API.get('/api/admin/stats');
@@ -162,6 +183,8 @@ const Admin = {
     },
 
     async loadUsers() {
+        if (!this.isAdmin()) return;
+
         try {
             const users = await API.get('/api/admin/users');
             const tbody = document.getElementById('users-table-body');
@@ -206,10 +229,12 @@ const Admin = {
     },
 
     editUserFromData(user) {
+        if (!this.isAdmin()) return;
         this.openModal(user);
     },
 
     async deleteUser(userId) {
+        if (!this.isAdmin()) return;
         if (!confirm('Tem certeza que deseja excluir este cliente? Essa ação é irreversível.')) return;
         try {
             await API.delete(`/api/admin/users/${userId}`);
@@ -222,6 +247,8 @@ const Admin = {
     },
 
     async loadBuilds() {
+        if (!this.isAdmin()) return;
+
         try {
             const builds = await API.get('/api/admin/builds');
             const tbody = document.getElementById('admin-builds-table-body');
@@ -264,6 +291,8 @@ const Admin = {
     },
 
     async loadActivity() {
+        if (!this.isAdmin()) return;
+
         try {
             const logs = await API.get('/api/admin/activity');
             const container = document.getElementById('activity-list');
