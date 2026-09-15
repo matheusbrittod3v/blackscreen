@@ -2,8 +2,8 @@ const { Resend } = require('resend');
 
 class EmailService {
     constructor() {
-        const apiKey = process.env.RESEND_API_KEY || '';
-        this.resend = new Resend(apiKey);
+        const apiKey = process.env.RESEND_API_KEY;
+        this.resend = apiKey ? new Resend(apiKey) : null;
         this.fromEmail = process.env.RESEND_FROM_EMAIL || 'BlackScreen Tool <nao-responda@blackscreentool.com.br>';
         this.siteUrl = process.env.SITE_URL || 'https://blackscreentool.com.br';
     }
@@ -12,6 +12,11 @@ class EmailService {
      * Envia e-mail com template HTML de confirmação de conta
      */
     async sendVerificationEmail({ to, name, verificationToken }) {
+        if (!this.resend) {
+            console.warn('⚠️ RESEND_API_KEY não configurada no ambiente (.env). E-mail de confirmação não disparado.');
+            return { error: 'RESEND_API_KEY_NOT_CONFIGURED' };
+        }
+
         const verifyUrl = `${this.siteUrl}/api/auth/verify-email?token=${verificationToken}`;
         const subject = 'Confirme seu e-mail - BlackScreen Tool';
         const html = this.getVerificationTemplate({ name, verifyUrl });
