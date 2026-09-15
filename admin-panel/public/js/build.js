@@ -9,35 +9,46 @@ const Build = {
     },
 
     async loadSettings() {
+        if (!API.token) return;
         try {
             const settings = await API.get('/api/build/settings');
-            document.getElementById('correctPassword').value = settings.CorrectPassword || '';
-            document.getElementById('customMessage').value = settings.CustomMessage || '';
+            if (settings) {
+                const passInput = document.getElementById('correctPassword');
+                const msgInput = document.getElementById('customMessage');
+                if (passInput) passInput.value = settings.CorrectPassword || '';
+                if (msgInput) msgInput.value = settings.CustomMessage || '';
+            }
         } catch (error) {
             console.error('Error loading settings:', error);
         }
     },
 
     async loadBuildLimit() {
+        if (!API.token) return;
         try {
             const data = await API.get('/api/build/build-limit');
-            document.getElementById('remaining-count').textContent = data.remaining;
+            if (data) {
+                const remCount = document.getElementById('remaining-count');
+                if (remCount) remCount.textContent = data.remaining;
 
-            const buildBtn = document.getElementById('startBuild');
-            const warning = document.getElementById('build-limit-warning');
+                const buildBtn = document.getElementById('startBuild');
+                const warning = document.getElementById('build-limit-warning');
 
-            if (!data.canBuild && Auth.currentUser?.role !== 'admin') {
-                buildBtn.disabled = true;
-                warning.innerHTML = `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    <span>Você atingiu seu limite de builds mensal.</span>
-                `;
-                warning.style.background = 'rgba(239, 68, 68, 0.1)';
-                warning.style.color = 'var(--danger)';
+                if (!data.canBuild && Auth.currentUser?.role !== 'admin') {
+                    if (buildBtn) buildBtn.disabled = true;
+                    if (warning) {
+                        warning.innerHTML = `
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <span>Você atingiu seu limite de builds mensal.</span>
+                        `;
+                        warning.style.background = 'rgba(239, 68, 68, 0.1)';
+                        warning.style.color = 'var(--danger)';
+                    }
+                }
             }
         } catch (error) {
             console.error('Error loading build limit:', error);
