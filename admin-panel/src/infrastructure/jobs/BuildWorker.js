@@ -6,7 +6,20 @@ const buildQueue = require('./BuildQueue');
 const buildRepository = require('../repositories/BuildRepository');
 const activityLogRepository = require('../repositories/ActivityLogRepository');
 
-const projectRoot = path.join(__dirname, '..', '..', '..');
+function resolveProjectRoot() {
+    let candidate = path.resolve(__dirname, '../../../../');
+    if (fs.existsSync(path.join(candidate, 'blackScreenTool.csproj'))) {
+        return candidate;
+    }
+    candidate = path.resolve(__dirname, '../../../');
+    if (fs.existsSync(path.join(candidate, 'blackScreenTool.csproj'))) {
+        return candidate;
+    }
+    return path.resolve(process.cwd(), '..');
+}
+
+const projectRoot = resolveProjectRoot();
+const csprojPath = path.join(projectRoot, 'blackScreenTool.csproj');
 const globalUtilPath = path.join(projectRoot, 'util');
 const masterImgPath = path.join(projectRoot, 'img');
 
@@ -17,6 +30,8 @@ class BuildWorker {
 
     init() {
         console.log('[BuildWorker] Worker initialized and listening for jobs...');
+        console.log(`[BuildWorker] Project root resolved to: ${projectRoot}`);
+        console.log(`[BuildWorker] Project file: ${csprojPath} (exists: ${fs.existsSync(csprojPath)})`);
         
         // Listen to queue events
         buildQueue.on('job:added', () => {
@@ -39,6 +54,7 @@ class BuildWorker {
 
         this.isWorking = true;
         buildQueue.activeJob = job;
+        let mainWinBackup = null;
 
         console.log(`[BuildWorker] 🚀 Processing Build Job #${job.id} (User #${job.userId})...`);
         buildQueue.emit('job:start', job);
@@ -66,7 +82,6 @@ class BuildWorker {
 
             // 4. Inject user's specific settings into MainWindow.xaml.cs with backup
             const mainWinPath = path.join(projectRoot, 'MainWindow.xaml.cs');
-            let mainWinBackup = null;
             if (await fs.pathExists(mainWinPath)) {
                 mainWinBackup = await fs.readFile(mainWinPath, 'utf8');
                 let content = mainWinBackup;
@@ -95,7 +110,7 @@ class BuildWorker {
             }
 
             // 5. Run dotnet publish
-            const publishCmd = 'dotnet publish -c Release -r win-x64 --self-contained false -p:EnableWindowsTargeting=true';
+            const publishCmd = `dotnet publish "${csprojPath}" -c Release -r win-x64 --self-contained false -p:EnableWindowsTargeting=true`;
 
             await new Promise((resolve, reject) => {
                 exec(publishCmd, { cwd: projectRoot }, async (error, stdout, stderr) => {
