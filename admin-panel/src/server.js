@@ -16,10 +16,13 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const buildRoutes = require('./routes/build');
+const grpcRoutes = require('./routes/grpc');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/build', buildRoutes);
+app.use('/api/grpc', grpcRoutes);
+app.use('/grpc', grpcRoutes);
 
 // SPA fallback - serve index.html for all non-API routes
 app.get('{*splat}', (req, res) => {

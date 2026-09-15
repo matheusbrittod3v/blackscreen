@@ -206,6 +206,29 @@ class DashboardComponent {
                                 🚀 INICIAR COMPILAÇÃO
                             </button>
                         </div>
+
+                        <!-- Active Build Live Status & Download Card -->
+                        <div id="active-build-container" class="glass-card active-build-card" style="margin-top:20px;display:none;padding:24px;border:1px solid rgba(225,29,72,0.3);background:rgba(20,20,30,0.6);border-radius:12px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                                <h4 style="margin:0;font-size:1.1rem;color:#fff;display:flex;align-items:center;gap:8px;">
+                                    <span>⚙️</span> Build em Andamento / Atual
+                                </h4>
+                                <span id="active-build-badge" class="status-badge queued">Na Fila</span>
+                            </div>
+                            <div style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">
+                                <p style="margin:4px 0;color:#fff;"><strong>Nome:</strong> <span id="active-build-name">-</span></p>
+                                <p style="margin:4px 0;"><strong>ID:</strong> #<span id="active-build-id">-</span></p>
+                                <p style="margin:6px 0;font-weight:500;" id="active-build-info">Aguardando processamento na fila...</p>
+                            </div>
+                            <div id="active-build-progress-wrap" style="background:rgba(255,255,255,0.08);height:8px;border-radius:4px;overflow:hidden;margin-bottom:16px;">
+                                <div id="active-build-progress-bar" style="width:15%;height:100%;background:linear-gradient(90deg, #f43f5e, #10b981);transition:width 0.4s ease;"></div>
+                            </div>
+                            <div id="active-build-actions" style="display:flex;justify-content:flex-end;">
+                                <a id="active-build-download-btn" href="#" class="btn-primary" download style="display:none;text-decoration:none;padding:12px 24px;font-weight:700;font-size:0.95rem;background:linear-gradient(135deg, #10b981, #059669);box-shadow:0 6px 20px rgba(16,185,129,0.3);">
+                                    📥 BAIXAR EXECUTÁVEL (.ZIP)
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </section>
 

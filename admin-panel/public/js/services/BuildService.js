@@ -8,6 +8,11 @@ class BuildService {
         this.setupBuild();
         this.loadSettings();
         this.loadBuildLimit();
+
+        // Connect real-time gRPC streaming channel
+        if (typeof gRPC !== 'undefined') {
+            gRPC.connectStream();
+        }
     }
 
     async loadSettings() {
@@ -205,6 +210,68 @@ class BuildService {
         window.location.href = `/api/build/assets/${encodeURIComponent(fileName)}?download=1&token=${encodeURIComponent(API.token)}`;
     }
 
+    updateActiveBuildCard(payload) {
+        const container = document.getElementById('active-build-container');
+        const badge = document.getElementById('active-build-badge');
+        const nameEl = document.getElementById('active-build-name');
+        const idEl = document.getElementById('active-build-id');
+        const infoEl = document.getElementById('active-build-info');
+        const progressBar = document.getElementById('active-build-progress-bar');
+        const downloadBtn = document.getElementById('active-build-download-btn');
+        const startBtn = document.getElementById('startBuild');
+
+        if (!container) return;
+        container.style.display = 'block';
+
+        if (payload.buildName) nameEl.textContent = payload.buildName;
+        if (payload.buildId) idEl.textContent = payload.buildId;
+
+        const statusLabels = {
+            queued: 'Na Fila',
+            building: 'Compilando',
+            completed: 'Concluído',
+            failed: 'Falhou'
+        };
+
+        const status = payload.status || 'queued';
+        if (badge) {
+            badge.className = `status-badge ${status}`;
+            badge.textContent = statusLabels[status] || status;
+        }
+
+        if (status === 'queued') {
+            const posText = payload.queuePosition ? ` (Posição na fila: #${payload.queuePosition})` : '';
+            if (infoEl) infoEl.textContent = `⏳ Build adicionado à fila. Aguarde o processamento pelo worker...${posText}`;
+            if (progressBar) progressBar.style.width = '25%';
+            if (downloadBtn) downloadBtn.style.display = 'none';
+            if (startBtn) startBtn.disabled = true;
+        } else if (status === 'building') {
+            if (infoEl) infoEl.textContent = '⚙️ Compilando executável em segundo plano via C#/.NET 9...';
+            if (progressBar) progressBar.style.width = '65%';
+            if (downloadBtn) downloadBtn.style.display = 'none';
+            if (startBtn) startBtn.disabled = true;
+        } else if (status === 'completed') {
+            const sizeText = payload.fileSize ? ` (${Utils.formatFileSize(payload.fileSize)})` : '';
+            if (infoEl) infoEl.textContent = `🎉 Executável compilado com sucesso! Clique abaixo para baixar.${sizeText}`;
+            if (progressBar) progressBar.style.width = '100%';
+            if (startBtn) startBtn.disabled = false;
+
+            const downloadUrl = payload.downloadUrl || `/api/build/download/${payload.buildId}?token=${encodeURIComponent(API.token)}`;
+            if (downloadBtn) {
+                downloadBtn.href = downloadUrl;
+                downloadBtn.style.display = 'inline-flex';
+            }
+        } else if (status === 'failed') {
+            if (infoEl) infoEl.textContent = `❌ Falha na compilação: ${payload.error || 'Erro interno'}`;
+            if (progressBar) {
+                progressBar.style.width = '100%';
+                progressBar.style.background = 'var(--danger)';
+            }
+            if (downloadBtn) downloadBtn.style.display = 'none';
+            if (startBtn) startBtn.disabled = false;
+        }
+    }
+
     setupBuild() {
         const buildBtn = document.getElementById('startBuild');
         if (!buildBtn) return;
@@ -239,7 +306,13 @@ class BuildService {
                 Dashboard.loadHistory();
 
                 if (result.buildId) {
-                    Utils.showToast(`🚀 Build #${result.buildId} adicionado à fila! Aguarde a conclusão...`, 'info');
+                    Utils.showToast(`🚀 Build #${result.buildId} adicionado à fila!`, 'info');
+                    this.updateActiveBuildCard({
+                        buildId: result.buildId,
+                        buildName,
+                        status: 'queued',
+                        queuePosition: result.queuePosition
+                    });
                     this.pollBuildStatus(result.buildId);
                 } else {
                     Utils.showToast('Build enviado para compilação.', 'info');
@@ -264,6 +337,7 @@ class BuildService {
 
                 Dashboard.loadRecentBuilds();
                 Dashboard.loadHistory();
+                this.updateActiveBuildCard(statusData);
 
                 if (currentStateKey !== lastStateKey) {
                     lastStateKey = currentStateKey;
@@ -278,16 +352,8 @@ class BuildService {
                 if (status === 'completed') {
                     clearInterval(pollInterval);
                     if (buildBtn) buildBtn.disabled = false;
-                    Utils.showToast(`🎉 Build #${buildId} concluído com sucesso! Baixando executável...`, 'success');
+                    Utils.showToast(`🎉 Build #${buildId} concluído com sucesso!`, 'success');
                     this.loadBuildLimit();
-                    
-                    setTimeout(() => {
-                        if (downloadUrl) {
-                            window.location.href = downloadUrl;
-                        } else {
-                            window.location.href = `/api/build/download/${buildId}?token=${encodeURIComponent(API.token)}`;
-                        }
-                    }, 500);
                 } else if (status === 'failed') {
                     clearInterval(pollInterval);
                     if (buildBtn) buildBtn.disabled = false;
