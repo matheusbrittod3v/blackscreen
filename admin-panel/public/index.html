@@ -7,11 +7,11 @@
     <title>BlackScreen Tool - Tela Preta & Desktop Virtual para Unlockers</title>
     <meta name="description" content="BlackScreen Tool - Crie áreas de trabalho virtuais, escureça a tela do cliente com mensagem personalizada e logo animado para atendimentos de unlock com total sigilo.">
     <link rel="icon" type="image/png" href="img/logo.png">
-    <link rel="stylesheet" href="css/main.css?v=6.0">
-    <link rel="stylesheet" href="css/landing.css?v=6.0">
-    <link rel="stylesheet" href="css/auth.css?v=6.0">
-    <link rel="stylesheet" href="css/dashboard.css?v=6.0">
-    <link rel="stylesheet" href="css/admin.css?v=6.0">
+    <link rel="stylesheet" href="css/main.css?v=7.0">
+    <link rel="stylesheet" href="css/landing.css?v=7.0">
+    <link rel="stylesheet" href="css/auth.css?v=7.0">
+    <link rel="stylesheet" href="css/dashboard.css?v=7.0">
+    <link rel="stylesheet" href="css/admin.css?v=7.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
@@ -33,8 +33,18 @@
     <!-- Toast Notifications Container -->
     <div id="toast" class="toast"></div>
 
-    <!-- Single Main Entry Point Script -->
-    <script src="js/bundle.js?v=6.0"></script>
+    <!-- Modular Application Scripts -->
+    <script src="js/utils/Utils.js?v=7.0"></script>
+    <script src="js/services/ApiService.js?v=7.0"></script>
+    <script src="js/services/AuthService.js?v=7.0"></script>
+    <script src="js/services/DashboardService.js?v=7.0"></script>
+    <script src="js/services/BuildService.js?v=7.0"></script>
+    <script src="js/services/AdminService.js?v=7.0"></script>
+    <script src="js/components/AdminComponent.js?v=7.0"></script>
+    <script src="js/components/LandingComponent.js?v=7.0"></script>
+    <script src="js/components/AuthModalComponent.js?v=7.0"></script>
+    <script src="js/components/DashboardComponent.js?v=7.0"></script>
+    <script src="js/app.js?v=7.0"></script>
 </body>
 
 </html>
