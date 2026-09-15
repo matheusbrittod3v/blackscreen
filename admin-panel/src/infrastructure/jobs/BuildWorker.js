@@ -64,10 +64,12 @@ class BuildWorker {
             const utilZipPath = path.join(projectRoot, 'util.zip');
             await this.zipFolder(job.userUtil, utilZipPath);
 
-            // 4. Inject user's specific settings into MainWindow.xaml.cs
+            // 4. Inject user's specific settings into MainWindow.xaml.cs with backup
             const mainWinPath = path.join(projectRoot, 'MainWindow.xaml.cs');
+            let mainWinBackup = null;
             if (await fs.pathExists(mainWinPath)) {
-                let content = await fs.readFile(mainWinPath, 'utf8');
+                mainWinBackup = await fs.readFile(mainWinPath, 'utf8');
+                let content = mainWinBackup;
 
                 const escapeCSharp = (str) => {
                     return (str || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
@@ -78,15 +80,15 @@ class BuildWorker {
 
                 content = content.replace(
                     /public string CorrectPassword \{ get; set; } = ".*?";/,
-                    `public string CorrectPassword { get; set; } = "${escapedPassword}";`
+                    () => `public string CorrectPassword { get; set; } = "${escapedPassword}";`
                 );
                 content = content.replace(
                     /public string CustomMessage \{ get; set; } = ".*?";/,
-                    `public string CustomMessage { get; set; } = "${escapedMessage}";`
+                    () => `public string CustomMessage { get; set; } = "${escapedMessage}";`
                 );
                 content = content.replace(
                     /private string _correctPassword = ".*?";/,
-                    `private string _correctPassword = "${escapedPassword}";`
+                    () => `private string _correctPassword = "${escapedPassword}";`
                 );
 
                 await fs.writeFile(mainWinPath, content, 'utf8');
@@ -98,8 +100,9 @@ class BuildWorker {
             await new Promise((resolve, reject) => {
                 exec(publishCmd, { cwd: projectRoot }, async (error, stdout, stderr) => {
                     if (error) {
-                        console.error(`[BuildWorker] ❌ dotnet publish error for Job #${job.id}:`, stderr || error.message);
-                        return reject(new Error(stderr || error.message || 'Falha na compilação do executável.'));
+                        const fullError = stderr || stdout || error.message;
+                        console.error(`[BuildWorker] ❌ dotnet publish error for Job #${job.id}:`, fullError);
+                        return reject(new Error(fullError || 'Falha na compilação do executável.'));
                     }
                     resolve(stdout);
                 });
@@ -161,6 +164,16 @@ class BuildWorker {
             this.isWorking = false;
             buildQueue.activeJob = null;
             
+            // Restore MainWindow.xaml.cs back to original state if modified
+            try {
+                const mainWinPath = path.join(projectRoot, 'MainWindow.xaml.cs');
+                if (mainWinBackup && (await fs.pathExists(mainWinPath))) {
+                    await fs.writeFile(mainWinPath, mainWinBackup, 'utf8');
+                }
+            } catch (mwErr) {
+                console.error('[BuildWorker] Erro ao restaurar MainWindow.xaml.cs:', mwErr);
+            }
+
             // Restore default logo.png and logo.ico from img/ folder back into global util/
             try {
                 const defaultPng = path.join(masterImgPath, 'logo.png');
