@@ -1,17 +1,16 @@
 /**
- * Admin Module - Client & Audit Management Panel
- * Protected by server-side JWT verification and strict client-side guards
+ * AdminService Class - Administrative Control Panel & User Audit System
  */
-const Admin = {
+class AdminService {
     init() {
         this.setupTabs();
         this.setupModal();
         this.setupUserForm();
-    },
+    }
 
     isAdmin() {
         return Auth.currentUser && Auth.currentUser.role === 'admin';
-    },
+    }
 
     setupTabs() {
         const tabs = document.querySelectorAll('.admin-tab');
@@ -46,7 +45,7 @@ const Admin = {
                 }
             });
         });
-    },
+    }
 
     setupModal() {
         const modal = document.getElementById('user-modal');
@@ -70,7 +69,7 @@ const Admin = {
                 });
             }
         });
-    },
+    }
 
     openModal(user = null) {
         if (!this.isAdmin()) {
@@ -110,12 +109,12 @@ const Admin = {
         }
 
         modal.classList.add('active');
-    },
+    }
 
     closeModal() {
         const modal = document.getElementById('user-modal');
         if (modal) modal.classList.remove('active');
-    },
+    }
 
     setupUserForm() {
         const form = document.getElementById('user-form');
@@ -161,7 +160,7 @@ const Admin = {
                 if (submitBtn) submitBtn.disabled = false;
             }
         });
-    },
+    }
 
     async loadDashboard() {
         if (!this.isAdmin()) return;
@@ -178,9 +177,9 @@ const Admin = {
 
             this.loadUsers();
         } catch (error) {
-            console.error('[Admin] Error loading admin stats:', error);
+            console.error('[AdminService] Error loading stats:', error);
         }
-    },
+    }
 
     async loadUsers() {
         if (!this.isAdmin()) return;
@@ -195,43 +194,16 @@ const Admin = {
                 return;
             }
 
-            tbody.innerHTML = users.map(u => {
-                const safeId = Utils.escapeHtml(u.id);
-                const safeName = Utils.escapeHtml(u.name);
-                const safeEmail = Utils.escapeHtml(u.email);
-                const safeRole = Utils.escapeHtml(u.role === 'admin' ? 'Administrador' : 'Membro');
-                const safeLimit = Utils.escapeHtml(u.monthlyBuildLimit ?? 5);
-                const isActive = u.isActive !== false;
-                const statusBadge = isActive
-                    ? '<span class="status-badge completed">Ativo</span>'
-                    : '<span class="status-badge failed">Desativado</span>';
-
-                const safeUserJson = Utils.escapeHtml(JSON.stringify(u));
-
-                return `
-                    <tr>
-                        <td>#${safeId}</td>
-                        <td><strong>${safeName}</strong></td>
-                        <td>${safeEmail}</td>
-                        <td>${safeRole}</td>
-                        <td>${safeLimit} builds/mês</td>
-                        <td>${statusBadge}</td>
-                        <td>
-                            <button type="button" class="btn-table-action" onclick='Admin.editUserFromData(${safeUserJson})'>Editar</button>
-                            <button type="button" class="btn-table-action danger" onclick="Admin.deleteUser(${safeId})">Excluir</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            tbody.innerHTML = users.map(u => this.renderUserRow(u)).join('');
         } catch (error) {
-            console.error('[Admin] Error loading users:', error);
+            console.error('[AdminService] Error loading users:', error);
         }
-    },
+    }
 
     editUserFromData(user) {
         if (!this.isAdmin()) return;
         this.openModal(user);
-    },
+    }
 
     async deleteUser(userId) {
         if (!this.isAdmin()) return;
@@ -244,7 +216,7 @@ const Admin = {
         } catch (error) {
             Utils.showToast(error.message, 'error');
         }
-    },
+    }
 
     async loadBuilds() {
         if (!this.isAdmin()) return;
@@ -259,36 +231,11 @@ const Admin = {
                 return;
             }
 
-            tbody.innerHTML = builds.map(b => {
-                const safeId = Utils.escapeHtml(b.id);
-                const safeUser = Utils.escapeHtml(b.User?.name || b.User?.email || `User #${b.userId}`);
-                const safeName = Utils.escapeHtml(b.buildName || '-');
-                const safeStatus = Utils.escapeHtml(b.status);
-                const safeSize = Utils.formatFileSize(b.fileSize);
-                const safeDate = Utils.formatDate(b.createdAt);
-                const statusLabel = Utils.escapeHtml(Dashboard.getStatusLabel(b.status));
-
-                return `
-                    <tr>
-                        <td>#${safeId}</td>
-                        <td><strong>${safeUser}</strong></td>
-                        <td>${safeName}</td>
-                        <td><span class="status-badge ${safeStatus}">${statusLabel}</span></td>
-                        <td>${safeSize}</td>
-                        <td>${safeDate}</td>
-                        <td>
-                            ${b.status === 'completed'
-                                ? `<a href="/api/build/download/${safeId}?token=${encodeURIComponent(API.token)}" class="btn-table-action" download>Baixar</a>`
-                                : '-'
-                            }
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            tbody.innerHTML = builds.map(b => this.renderBuildRow(b)).join('');
         } catch (error) {
-            console.error('[Admin] Error loading admin builds:', error);
+            console.error('[AdminService] Error loading builds:', error);
         }
-    },
+    }
 
     async loadActivity() {
         if (!this.isAdmin()) return;
@@ -303,28 +250,90 @@ const Admin = {
                 return;
             }
 
-            container.innerHTML = logs.map(l => {
-                const safeAction = Utils.escapeHtml(l.action);
-                const safeDesc = Utils.escapeHtml(l.description);
-                const safeUser = Utils.escapeHtml(l.User?.name || l.User?.email || 'Sistema');
-                const safeIp = Utils.escapeHtml(l.ipAddress || '-');
-                const safeDate = Utils.formatDate(l.createdAt);
-
-                return `
-                    <div class="activity-item" style="padding:12px 16px;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;gap:12px;">
-                        <div>
-                            <span class="status-badge info" style="margin-right:8px;">${safeAction}</span>
-                            <strong>${safeUser}</strong>: ${safeDesc}
-                        </div>
-                        <div style="text-align:right;font-size:0.75rem;color:var(--text-muted);">
-                            <div>${safeDate}</div>
-                            <div>IP: ${safeIp}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            container.innerHTML = logs.map(l => this.renderActivityRow(l)).join('');
         } catch (error) {
-            console.error('[Admin] Error loading activity logs:', error);
+            console.error('[AdminService] Error loading activity logs:', error);
         }
     }
-};
+
+    // Isolated HTML Component Builders
+    renderUserRow(u) {
+        const safeId = Utils.escapeHtml(u.id);
+        const safeName = Utils.escapeHtml(u.name);
+        const safeEmail = Utils.escapeHtml(u.email);
+        const safeRole = Utils.escapeHtml(u.role === 'admin' ? 'Administrador' : 'Membro');
+        const safeLimit = Utils.escapeHtml(u.monthlyBuildLimit ?? 5);
+        const isActive = u.isActive !== false;
+        const statusBadge = isActive
+            ? '<span class="status-badge completed">Ativo</span>'
+            : '<span class="status-badge failed">Desativado</span>';
+
+        const safeUserJson = Utils.escapeHtml(JSON.stringify(u));
+
+        return `
+            <tr>
+                <td>#${safeId}</td>
+                <td><strong>${safeName}</strong></td>
+                <td>${safeEmail}</td>
+                <td>${safeRole}</td>
+                <td>${safeLimit} builds/mês</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <button type="button" class="btn-table-action" onclick='Admin.editUserFromData(${safeUserJson})'>Editar</button>
+                    <button type="button" class="btn-table-action danger" onclick="Admin.deleteUser(${safeId})">Excluir</button>
+                </td>
+            </tr>
+        `;
+    }
+
+    renderBuildRow(b) {
+        const safeId = Utils.escapeHtml(b.id);
+        const safeUser = Utils.escapeHtml(b.User?.name || b.User?.email || `User #${b.userId}`);
+        const safeName = Utils.escapeHtml(b.buildName || '-');
+        const safeStatus = Utils.escapeHtml(b.status);
+        const safeSize = Utils.formatFileSize(b.fileSize);
+        const safeDate = Utils.formatDate(b.createdAt);
+        const statusLabel = Utils.escapeHtml(Dashboard.getStatusLabel(b.status));
+
+        return `
+            <tr>
+                <td>#${safeId}</td>
+                <td><strong>${safeUser}</strong></td>
+                <td>${safeName}</td>
+                <td><span class="status-badge ${safeStatus}">${statusLabel}</span></td>
+                <td>${safeSize}</td>
+                <td>${safeDate}</td>
+                <td>
+                    ${b.status === 'completed'
+                        ? `<a href="/api/build/download/${safeId}?token=${encodeURIComponent(API.token)}" class="btn-table-action" download>Baixar</a>`
+                        : '-'
+                    }
+                </td>
+            </tr>
+        `;
+    }
+
+    renderActivityRow(l) {
+        const safeAction = Utils.escapeHtml(l.action);
+        const safeDesc = Utils.escapeHtml(l.description);
+        const safeUser = Utils.escapeHtml(l.User?.name || l.User?.email || 'Sistema');
+        const safeIp = Utils.escapeHtml(l.ipAddress || '-');
+        const safeDate = Utils.formatDate(l.createdAt);
+
+        return `
+            <div class="activity-item" style="padding:12px 16px;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                <div>
+                    <span class="status-badge info" style="margin-right:8px;">${safeAction}</span>
+                    <strong>${safeUser}</strong>: ${safeDesc}
+                </div>
+                <div style="text-align:right;font-size:0.75rem;color:var(--text-muted);">
+                    <div>${safeDate}</div>
+                    <div>IP: ${safeIp}</div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// Global Admin Instance
+const Admin = new AdminService();

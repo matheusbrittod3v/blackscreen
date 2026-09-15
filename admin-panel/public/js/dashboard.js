@@ -1,12 +1,12 @@
 /**
- * Dashboard Module - Main User Panel Navigation & Real-time Metrics
+ * DashboardService Class - Handles User Navigation, Metrics & Isolated Data Views
  */
-const Dashboard = {
+class DashboardService {
     init() {
         this.setupNavigation();
         this.setupLogout();
         this.setupGoToBuild();
-    },
+    }
 
     setupNavigation() {
         const navItems = document.querySelectorAll('.nav-item');
@@ -16,22 +16,19 @@ const Dashboard = {
                 this.navigateTo(page);
             });
         });
-    },
+    }
 
     navigateTo(pageId) {
         if (!pageId) pageId = 'user-dashboard';
 
-        // Update nav items active state
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.toggle('active', item.dataset.page === pageId);
         });
 
-        // Update active page container
         document.querySelectorAll('.page').forEach(page => {
             page.classList.toggle('active', page.id === pageId);
         });
 
-        // Load section data dynamically
         switch (pageId) {
             case 'user-dashboard':
                 this.loadUserDashboard();
@@ -51,7 +48,7 @@ const Dashboard = {
                 }
                 break;
         }
-    },
+    }
 
     setupLogout() {
         const btn = document.getElementById('logout-btn');
@@ -60,7 +57,7 @@ const Dashboard = {
                 Auth.logout();
             });
         }
-    },
+    }
 
     setupGoToBuild() {
         const btn = document.getElementById('go-to-build');
@@ -69,7 +66,7 @@ const Dashboard = {
                 this.navigateTo('build-page');
             });
         }
-    },
+    }
 
     updateUserInfo() {
         const user = Auth.currentUser;
@@ -83,13 +80,12 @@ const Dashboard = {
         if (roleEl) roleEl.textContent = user.role === 'admin' ? 'Administrador' : 'Membro';
         if (avatarEl) avatarEl.textContent = (user.name || 'U').charAt(0).toUpperCase();
 
-        // Toggle admin-only UI elements
         if (user.role === 'admin') {
             document.body.classList.add('is-admin');
         } else {
             document.body.classList.remove('is-admin');
         }
-    },
+    }
 
     async loadUserDashboard() {
         try {
@@ -111,9 +107,9 @@ const Dashboard = {
 
             await this.loadRecentBuilds();
         } catch (error) {
-            console.error('[Dashboard] Error loading dashboard stats:', error);
+            console.error('[DashboardService] Error loading stats:', error);
         }
-    },
+    }
 
     async loadRecentBuilds() {
         try {
@@ -126,27 +122,11 @@ const Dashboard = {
                 return;
             }
 
-            container.innerHTML = builds.slice(0, 5).map(build => {
-                const safeName = Utils.escapeHtml(build.buildName || `Build #${build.id}`);
-                const safeStatus = Utils.escapeHtml(build.status || 'pending');
-                const safeDate = Utils.formatDate(build.createdAt);
-                const statusLabel = Utils.escapeHtml(this.getStatusLabel(build.status));
-
-                return `
-                    <div class="build-item">
-                        <div class="build-status ${safeStatus}"></div>
-                        <div class="build-details">
-                            <span class="build-name">${safeName}</span>
-                            <span class="build-date">${safeDate}</span>
-                        </div>
-                        <span class="status-badge ${safeStatus}">${statusLabel}</span>
-                    </div>
-                `;
-            }).join('');
+            container.innerHTML = builds.slice(0, 5).map(build => this.renderRecentBuildItem(build)).join('');
         } catch (error) {
-            console.error('[Dashboard] Error loading recent builds:', error);
+            console.error('[DashboardService] Error loading recent builds:', error);
         }
-    },
+    }
 
     async loadHistory() {
         try {
@@ -159,35 +139,11 @@ const Dashboard = {
                 return;
             }
 
-            tbody.innerHTML = builds.map(build => {
-                const safeId = Utils.escapeHtml(build.id);
-                const safeName = Utils.escapeHtml(build.buildName || '-');
-                const safeStatus = Utils.escapeHtml(build.status || 'pending');
-                const safeSize = Utils.formatFileSize(build.fileSize);
-                const safeDownloads = Utils.escapeHtml(build.downloadCount || 0);
-                const safeDate = Utils.formatDate(build.createdAt);
-                const statusLabel = Utils.escapeHtml(this.getStatusLabel(build.status));
-
-                const actionHtml = build.status === 'completed'
-                    ? `<a href="/api/build/download/${safeId}?token=${encodeURIComponent(API.token)}" class="btn-table-action" download>Baixar ZIP</a>`
-                    : `<span style="color:var(--text-muted);font-size:0.75rem;">-</span>`;
-
-                return `
-                    <tr>
-                        <td>#${safeId}</td>
-                        <td>${safeName}</td>
-                        <td><span class="status-badge ${safeStatus}">${statusLabel}</span></td>
-                        <td>${safeSize}</td>
-                        <td>${safeDownloads}</td>
-                        <td>${safeDate}</td>
-                        <td>${actionHtml}</td>
-                    </tr>
-                `;
-            }).join('');
+            tbody.innerHTML = builds.map(build => this.renderHistoryRow(build)).join('');
         } catch (error) {
-            console.error('[Dashboard] Error loading history:', error);
+            console.error('[DashboardService] Error loading history:', error);
         }
-    },
+    }
 
     getStatusLabel(status) {
         const labels = {
@@ -198,4 +154,52 @@ const Dashboard = {
         };
         return labels[status] || status;
     }
-};
+
+    // Isolated HTML Component Rendering Methods
+    renderRecentBuildItem(build) {
+        const safeName = Utils.escapeHtml(build.buildName || `Build #${build.id}`);
+        const safeStatus = Utils.escapeHtml(build.status || 'pending');
+        const safeDate = Utils.formatDate(build.createdAt);
+        const statusLabel = Utils.escapeHtml(this.getStatusLabel(build.status));
+
+        return `
+            <div class="build-item">
+                <div class="build-status ${safeStatus}"></div>
+                <div class="build-details">
+                    <span class="build-name">${safeName}</span>
+                    <span class="build-date">${safeDate}</span>
+                </div>
+                <span class="status-badge ${safeStatus}">${statusLabel}</span>
+            </div>
+        `;
+    }
+
+    renderHistoryRow(build) {
+        const safeId = Utils.escapeHtml(build.id);
+        const safeName = Utils.escapeHtml(build.buildName || '-');
+        const safeStatus = Utils.escapeHtml(build.status || 'pending');
+        const safeSize = Utils.formatFileSize(build.fileSize);
+        const safeDownloads = Utils.escapeHtml(build.downloadCount || 0);
+        const safeDate = Utils.formatDate(build.createdAt);
+        const statusLabel = Utils.escapeHtml(this.getStatusLabel(build.status));
+
+        const actionHtml = build.status === 'completed'
+            ? `<a href="/api/build/download/${safeId}?token=${encodeURIComponent(API.token)}" class="btn-table-action" download>Baixar ZIP</a>`
+            : `<span style="color:var(--text-muted);font-size:0.75rem;">-</span>`;
+
+        return `
+            <tr>
+                <td>#${safeId}</td>
+                <td>${safeName}</td>
+                <td><span class="status-badge ${safeStatus}">${statusLabel}</span></td>
+                <td>${safeSize}</td>
+                <td>${safeDownloads}</td>
+                <td>${safeDate}</td>
+                <td>${actionHtml}</td>
+            </tr>
+        `;
+    }
+}
+
+// Global Dashboard Instance
+const Dashboard = new DashboardService();

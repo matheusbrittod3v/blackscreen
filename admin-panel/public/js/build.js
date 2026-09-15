@@ -1,14 +1,14 @@
 /**
- * Build Module - Custom EXE/Zip Generation Workspace
+ * BuildService Class - Manages EXE/ZIP Compilation Workspace & Custom Assets
  */
-const Build = {
+class BuildService {
     init() {
         this.setupSettingsForm();
         this.setupFileUploads();
         this.setupBuild();
         this.loadSettings();
         this.loadBuildLimit();
-    },
+    }
 
     async loadSettings() {
         if (!API.token) return;
@@ -21,9 +21,9 @@ const Build = {
                 if (msgInput) msgInput.value = settings.CustomMessage || '';
             }
         } catch (error) {
-            console.error('[Build] Error loading build settings:', error);
+            console.error('[BuildService] Error loading settings:', error);
         }
-    },
+    }
 
     async loadBuildLimit() {
         if (!API.token) return;
@@ -56,9 +56,9 @@ const Build = {
                 }
             }
         } catch (error) {
-            console.error('[Build] Error loading build limit:', error);
+            console.error('[BuildService] Error loading build limit:', error);
         }
-    },
+    }
 
     setupSettingsForm() {
         const settingsForm = document.getElementById('settings-form');
@@ -81,7 +81,7 @@ const Build = {
                 if (saveBtn) saveBtn.disabled = false;
             }
         });
-    },
+    }
 
     setupFileUploads() {
         const uploadBtn = document.getElementById('uploadAssets');
@@ -127,7 +127,7 @@ const Build = {
                 }
             });
         }
-    },
+    }
 
     setupBuild() {
         const buildBtn = document.getElementById('startBuild');
@@ -169,4 +169,7 @@ const Build = {
             }
         });
     }
-};
+}
+
+// Global Build Instance
+const Build = new BuildService();

@@ -1,9 +1,11 @@
 /**
- * Secure API Client Service
+ * ApiService Class - Centralized HTTP Client & Security Interceptor
  */
-const API = {
-    baseUrl: '',
-    token: localStorage.getItem('token'),
+class ApiService {
+    constructor(baseUrl = '') {
+        this.baseUrl = baseUrl;
+        this.token = localStorage.getItem('token');
+    }
 
     setToken(token) {
         this.token = token;
@@ -12,7 +14,7 @@ const API = {
         } else {
             localStorage.removeItem('token');
         }
-    },
+    }
 
     getHeaders() {
         const headers = {
@@ -22,7 +24,7 @@ const API = {
             headers['Authorization'] = `Bearer ${this.token}`;
         }
         return headers;
-    },
+    }
 
     async request(endpoint, options = {}) {
         try {
@@ -44,7 +46,7 @@ const API = {
             }
 
             if (!response.ok) {
-                // Security Interceptor: handle 401 Unauthorized or 403 Account Deactivated
+                // Security Interceptor: Handle 401 Unauthorized or 403 Forbidden
                 if ((response.status === 401 || response.status === 403) && this.token) {
                     if (data.error !== 'Conta desativada' && !endpoint.includes('/login')) {
                         this.setToken(null);
@@ -65,29 +67,29 @@ const API = {
         } catch (error) {
             throw error;
         }
-    },
+    }
 
     async get(endpoint) {
         return this.request(endpoint, { method: 'GET' });
-    },
+    }
 
     async post(endpoint, body) {
         return this.request(endpoint, {
             method: 'POST',
             body: JSON.stringify(body)
         });
-    },
+    }
 
     async put(endpoint, body) {
         return this.request(endpoint, {
             method: 'PUT',
             body: JSON.stringify(body)
         });
-    },
+    }
 
     async delete(endpoint) {
         return this.request(endpoint, { method: 'DELETE' });
-    },
+    }
 
     async upload(endpoint, formData) {
         const headers = {};
@@ -112,4 +114,7 @@ const API = {
 
         return data;
     }
-};
+}
+
+// Global API instance
+const API = new ApiService();

@@ -1,11 +1,13 @@
 /**
- * Security & Utility Helpers
+ * Utils Class - Security & Data Formatting Helpers
  */
-const Utils = {
+class Utils {
     /**
-     * Escape HTML special characters to prevent Cross-Site Scripting (XSS)
+     * Escape HTML special characters to prevent XSS attacks
+     * @param {string|number} str 
+     * @returns {string}
      */
-    escapeHtml(str) {
+    static escapeHtml(str) {
         if (str === null || str === undefined) return '';
         return String(str)
             .replace(/&/g, '&amp;')
@@ -13,12 +15,14 @@ const Utils = {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
-    },
+    }
 
     /**
      * Format ISO date string into PT-BR locale format
+     * @param {string} dateString 
+     * @returns {string}
      */
-    formatDate(dateString) {
+    static formatDate(dateString) {
         if (!dateString) return '-';
         try {
             const date = new Date(dateString);
@@ -33,22 +37,26 @@ const Utils = {
         } catch (e) {
             return '-';
         }
-    },
+    }
 
     /**
-     * Format bytes into human readable size (KB, MB, GB)
+     * Format bytes into human-readable size
+     * @param {number} bytes 
+     * @returns {string}
      */
-    formatFileSize(bytes) {
+    static formatFileSize(bytes) {
         if (!bytes || isNaN(bytes) || bytes === 0) return '-';
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(1024));
         return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
-    },
+    }
 
     /**
-     * Display a floating Toast notification safely
+     * Display toast notifications safely
+     * @param {string} message 
+     * @param {string} type 
      */
-    showToast(message, type = 'info') {
+    static showToast(message, type = 'info') {
         const toast = document.getElementById('toast');
         if (!toast) return;
 
@@ -60,9 +68,9 @@ const Utils = {
             toast.classList.remove('show');
         }, 3500);
     }
-};
+}
 
-// Global fallback for legacy calls
+// Global helper functions
 function showToast(message, type = 'info') {
     Utils.showToast(message, type);
 }

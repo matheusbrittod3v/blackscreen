@@ -1,15 +1,17 @@
 /**
- * Auth Module - Secure Authentication & Session Management
+ * AuthService Class - Handles Client Authentication & User Session State
  */
-const Auth = {
-    currentUser: null,
+class AuthService {
+    constructor() {
+        this.currentUser = null;
+    }
 
     init() {
         this.setupTabs();
         this.setupForms();
         this.setupPasswordToggle();
         this.checkUrlParams();
-    },
+    }
 
     checkUrlParams() {
         const params = new URLSearchParams(window.location.search);
@@ -26,7 +28,7 @@ const Auth = {
             }, 300);
             window.history.replaceState({}, document.title, window.location.pathname);
         }
-    },
+    }
 
     setupTabs() {
         const tabs = document.querySelectorAll('.tab-btn');
@@ -36,7 +38,7 @@ const Auth = {
                 this.switchTab(target);
             });
         });
-    },
+    }
 
     switchTab(target) {
         const tabs = document.querySelectorAll('.tab-btn');
@@ -61,10 +63,10 @@ const Auth = {
                 subtitle.textContent = 'Entre com suas credenciais para gerenciar seus builds';
             }
         }
-    },
+    }
 
     setupForms() {
-        // Login Form Submit
+        // Login Form
         const loginForm = document.getElementById('login-form');
         if (loginForm) {
             loginForm.addEventListener('submit', async (e) => {
@@ -106,7 +108,7 @@ const Auth = {
             });
         }
 
-        // Register Form Submit
+        // Register Form
         const registerForm = document.getElementById('register-form');
         if (registerForm) {
             registerForm.addEventListener('submit', async (e) => {
@@ -158,7 +160,7 @@ const Auth = {
                 }
             });
         }
-    },
+    }
 
     showVerificationAlert(email) {
         const box = document.getElementById('resend-verification-box');
@@ -176,7 +178,7 @@ const Auth = {
             `;
             box.style.display = 'block';
         }
-    },
+    }
 
     showResendOption(email) {
         const box = document.getElementById('resend-verification-box');
@@ -194,7 +196,7 @@ const Auth = {
             `;
             box.style.display = 'block';
         }
-    },
+    }
 
     async resendVerification(email) {
         if (!email) {
@@ -210,7 +212,7 @@ const Auth = {
         } catch (error) {
             Utils.showToast(error.message, 'error');
         }
-    },
+    }
 
     setupPasswordToggle() {
         document.querySelectorAll('.toggle-password').forEach(btn => {
@@ -230,7 +232,7 @@ const Auth = {
                 }
             });
         });
-    },
+    }
 
     async checkAuth() {
         if (!API.token) return false;
@@ -249,7 +251,7 @@ const Auth = {
             this.currentUser = null;
             return false;
         }
-    },
+    }
 
     logout() {
         API.setToken(null);
@@ -258,4 +260,7 @@ const Auth = {
         App.showLanding();
         Utils.showToast('Logout realizado com sucesso', 'info');
     }
-};
+}
+
+// Global Auth Instance
+const Auth = new AuthService();
