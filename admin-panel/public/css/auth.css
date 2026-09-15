@@ -2,13 +2,14 @@
    AUTH MODAL OVERLAY STYLES (POP-UP)
    ============================================ */
 
+#auth-modal.auth-modal-overlay,
 .auth-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 10000;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 10000 !important;
     display: none;
     align-items: center;
     justify-content: center;
@@ -16,6 +17,7 @@
     box-sizing: border-box;
 }
 
+#auth-modal.auth-modal-overlay.active,
 .auth-modal-overlay.active {
     display: flex !important;
 }
