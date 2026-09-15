@@ -3,7 +3,6 @@ const multer = require('multer');
 const archiver = require('archiver');
 const fs = require('fs-extra');
 const path = require('path');
-const pngToIco = require('png-to-ico');
 const router = express.Router();
 const { authMiddleware } = require('../middleware/auth');
 const buildRepository = require('../infrastructure/repositories/BuildRepository');
@@ -14,6 +13,13 @@ const buildQueue = require('../infrastructure/jobs/BuildQueue');
 const projectRoot = path.join(__dirname, '..', '..', '..');
 const globalUtilPath = path.join(projectRoot, 'util');
 const storageBase = path.join(projectRoot, 'storage', 'users');
+
+// Helper to handle ESM png-to-ico package dynamically in CommonJS
+async function convertPngToIco(pngPath) {
+    const pngToIcoModule = await import('png-to-ico');
+    const fn = pngToIcoModule.default || pngToIcoModule;
+    return await fn(pngPath);
+}
 
 // Apply auth middleware to all build routes
 router.use(authMiddleware);
@@ -42,7 +48,7 @@ async function ensureUserStorage(userId) {
     const userPngPath = path.join(userUtil, 'logo.png');
     if (!(await fs.pathExists(userIcoPath)) && (await fs.pathExists(userPngPath))) {
         try {
-            const buf = await pngToIco(userPngPath);
+            const buf = await convertPngToIco(userPngPath);
             await fs.writeFile(userIcoPath, buf);
             console.log(`[ensureUserStorage] Auto-generated logo.ico from logo.png for user #${userId}`);
         } catch (e) {
@@ -147,7 +153,7 @@ router.post('/upload', upload.fields([
             try {
                 const userPngPath = path.join(userUtil, 'logo.png');
                 const userIcoPath = path.join(userUtil, 'logo.ico');
-                const buf = await pngToIco(userPngPath);
+                const buf = await convertPngToIco(userPngPath);
                 await fs.writeFile(userIcoPath, buf);
                 updates.logoIco = 'logo.ico';
             } catch (convErr) {
@@ -175,7 +181,7 @@ router.post('/convert-png-to-ico', async (req, res) => {
             return res.status(404).json({ error: 'Nenhum arquivo logo.png encontrado em sua conta.' });
         }
 
-        const buf = await pngToIco(userPngPath);
+        const buf = await convertPngToIco(userPngPath);
         await fs.writeFile(userIcoPath, buf);
         await userSettingsRepository.upsert(req.user.id, { logoIco: 'logo.ico' });
 
