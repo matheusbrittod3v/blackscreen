@@ -33,26 +33,13 @@ async function ensureUserStorage(userId) {
     await fs.ensureDir(userUtil);
     await fs.ensureDir(userBuilds);
 
-    // If user has no default logos yet, copy from global util
+    // Copy pre-existing default logos from global util if missing
     const defaults = ['logo.png', 'logo.ico', 'logo.gif'];
     for (const file of defaults) {
         const userFilePath = path.join(userUtil, file);
         const globalFilePath = path.join(globalUtilPath, file);
         if (!(await fs.pathExists(userFilePath)) && (await fs.pathExists(globalFilePath))) {
             await fs.copy(globalFilePath, userFilePath);
-        }
-    }
-
-    // Auto-generate logo.ico from logo.png if missing
-    const userIcoPath = path.join(userUtil, 'logo.ico');
-    const userPngPath = path.join(userUtil, 'logo.png');
-    if (!(await fs.pathExists(userIcoPath)) && (await fs.pathExists(userPngPath))) {
-        try {
-            const buf = await convertPngToIco(userPngPath);
-            await fs.writeFile(userIcoPath, buf);
-            console.log(`[ensureUserStorage] Auto-generated logo.ico from logo.png for user #${userId}`);
-        } catch (e) {
-            console.error(`[ensureUserStorage] Failed to auto-generate ICO for user #${userId}:`, e.message);
         }
     }
 
@@ -178,14 +165,17 @@ router.post('/convert-png-to-ico', async (req, res) => {
         const userIcoPath = path.join(userUtil, 'logo.ico');
 
         if (!(await fs.pathExists(userPngPath))) {
-            return res.status(404).json({ error: 'Nenhum arquivo logo.png encontrado em sua conta.' });
+            return res.status(404).json({ error: 'Nenhum arquivo logo.png encontrado em sua conta. Envie um PNG primeiro.' });
         }
 
         const buf = await convertPngToIco(userPngPath);
         await fs.writeFile(userIcoPath, buf);
         await userSettingsRepository.upsert(req.user.id, { logoIco: 'logo.ico' });
 
-        res.json({ message: '✨ Ícone (.ico) gerado do seu PNG com sucesso!' });
+        res.json({
+            message: '✨ Ícone (.ico) gerado com sucesso a partir do seu PNG!',
+            downloadUrl: `/api/build/assets/logo.ico?download=1&token=${encodeURIComponent(req.token || '')}`
+        });
     } catch (err) {
         console.error('PNG to ICO conversion route error:', err);
         res.status(500).json({ error: 'Erro ao converter PNG para ICO: ' + err.message });

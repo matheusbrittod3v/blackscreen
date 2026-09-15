@@ -99,6 +99,9 @@ class BuildService {
 
     setupFileUploads() {
         const uploadBtn = document.getElementById('uploadAssets');
+        const convertBtn = document.getElementById('convertPngToIco');
+        const pngInput = document.getElementById('file-png');
+
         ['file-png', 'file-ico', 'file-gif'].forEach(id => {
             const input = document.getElementById(id);
             if (!input) return;
@@ -108,6 +111,14 @@ class BuildService {
                     zone.classList.add('selected');
                     const p = zone.querySelector('p');
                     if (p) p.textContent = Utils.escapeHtml(e.target.files[0].name);
+
+                    // Enable convert button if PNG selected
+                    if (id === 'file-png' && convertBtn) {
+                        convertBtn.disabled = false;
+                        convertBtn.style.opacity = '1';
+                        convertBtn.style.cursor = 'pointer';
+                        convertBtn.title = 'Converter seu logo.png em logo.ico';
+                    }
                 }
             });
         });
@@ -128,6 +139,11 @@ class BuildService {
                 try {
                     const result = await API.upload('/api/build/upload', formData);
                     Utils.showToast(result.message || 'Arquivos enviados com sucesso!', 'success');
+                    if (pngFile && convertBtn) {
+                        convertBtn.disabled = false;
+                        convertBtn.style.opacity = '1';
+                        convertBtn.style.cursor = 'pointer';
+                    }
                 } catch (error) {
                     Utils.showToast(error.message, 'error');
                 } finally {
@@ -136,14 +152,27 @@ class BuildService {
             });
         }
 
-        const convertBtn = document.getElementById('convertPngToIco');
         if (convertBtn) {
             convertBtn.addEventListener('click', async () => {
+                // If user selected a new PNG file but hasn't uploaded it yet, upload it first
+                const pngFile = document.getElementById('file-png')?.files[0];
+                if (pngFile) {
+                    const formData = new FormData();
+                    formData.append('logo_png', pngFile);
+                    try {
+                        await API.upload('/api/build/upload', formData);
+                    } catch (e) {}
+                }
+
                 convertBtn.disabled = true;
                 Utils.showToast('⚙️ Convertendo PNG para Ícone (.ico)... Aguarde.', 'info');
                 try {
                     const result = await API.post('/api/build/convert-png-to-ico', {});
                     Utils.showToast(result.message || '✨ Ícone (.ico) gerado com sucesso!', 'success');
+                    
+                    if (result.downloadUrl) {
+                        this.showConvertedIcoModal(result.downloadUrl);
+                    }
                 } catch (error) {
                     Utils.showToast(error.message, 'error');
                 } finally {
@@ -151,6 +180,40 @@ class BuildService {
                 }
             });
         }
+    }
+
+    showConvertedIcoModal(downloadUrl) {
+        const modalRoot = document.getElementById('modal-root');
+        if (!modalRoot) return;
+
+        modalRoot.innerHTML = `
+        <div id="converted-ico-modal" class="modal active" style="display:flex !important;">
+            <div class="modal-overlay" onclick="Build.closeIcoModal()"></div>
+            <div class="modal-container glass-card" style="max-width:440px;text-align:center;padding:28px 24px;position:relative;z-index:100001;">
+                <div style="font-size:3rem;margin-bottom:12px;">✨💎</div>
+                <h2 style="font-size:1.3rem;margin-bottom:8px;color:#fff;">Ícone (.ico) Gerado com Sucesso!</h2>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:24px;line-height:1.5;">
+                    Seu arquivo <strong>logo.png</strong> foi convertido para o formato executável do Windows (<strong>logo.ico</strong>). Clique abaixo para baixá-lo.
+                </p>
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    <button type="button" class="btn-secondary" onclick="Build.closeIcoModal()">Fechar</button>
+                    <a href="${downloadUrl}" class="btn-primary" download="logo.ico" onclick="setTimeout(() => Build.closeIcoModal(), 1000)" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Baixar Ícone (.ico)
+                    </a>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
+    closeIcoModal() {
+        const modalRoot = document.getElementById('modal-root');
+        if (modalRoot) modalRoot.innerHTML = '';
     }
 
     downloadAsset(fileName) {

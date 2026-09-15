@@ -154,38 +154,35 @@ class DashboardComponent {
                                         <div class="drop-zone" onclick="document.getElementById('file-png').click()">
                                             <div class="drop-content">
                                                 <span class="upload-icon">📁</span>
-                                                <p>logo.png</p>
+                                                <p id="png-filename-display">logo.png</p>
                                             </div>
                                             <input type="file" id="file-png" hidden accept=".png">
                                         </div>
-                                        <button type="button" class="btn-table-action" style="margin-top:6px;width:100%;" onclick="Build.downloadAsset('logo.png')">📥 Baixar PNG</button>
                                     </div>
                                     <div class="upload-item">
-                                        <label>Ícone Executável (ICO) <span style="font-size:0.7rem;color:var(--text-muted);">(ou gerado do PNG)</span></label>
+                                        <label>Ícone Executável (ICO)</label>
                                         <div class="drop-zone" onclick="document.getElementById('file-ico').click()">
                                             <div class="drop-content">
                                                 <span class="upload-icon">💎</span>
-                                                <p>logo.ico</p>
+                                                <p id="ico-filename-display">logo.ico</p>
                                             </div>
                                             <input type="file" id="file-ico" hidden accept=".ico">
                                         </div>
-                                        <button type="button" class="btn-table-action" style="margin-top:6px;width:100%;" onclick="Build.downloadAsset('logo.ico')">📥 Baixar ICO</button>
                                     </div>
                                     <div class="upload-item">
                                         <label>Logo Animada (GIF)</label>
                                         <div class="drop-zone" onclick="document.getElementById('file-gif').click()">
                                             <div class="drop-content">
                                                 <span class="upload-icon">✨</span>
-                                                <p>logo.gif</p>
+                                                <p id="gif-filename-display">logo.gif</p>
                                             </div>
                                             <input type="file" id="file-gif" hidden accept=".gif">
                                         </div>
-                                        <button type="button" class="btn-table-action" style="margin-top:6px;width:100%;" onclick="Build.downloadAsset('logo.gif')">📥 Baixar GIF</button>
                                     </div>
                                 </div>
                                 <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
                                     <button id="uploadAssets" class="btn-secondary" style="flex:1;">Sincronizar Arquivos</button>
-                                    <button id="convertPngToIco" type="button" class="btn-secondary" style="flex:1;background:rgba(108,92,231,0.2);border-color:rgba(108,92,231,0.4);" title="Converte automaticamente seu logo.png em logo.ico">⚡ Converter PNG &rarr; ICO</button>
+                                    <button id="convertPngToIco" type="button" class="btn-secondary" disabled style="flex:1;opacity:0.5;cursor:not-allowed;" title="Selecione ou envie um logo.png para converter">⚡ Converter PNG &rarr; ICO</button>
                                 </div>
                             </div>
                         </div>
