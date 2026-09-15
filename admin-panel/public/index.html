@@ -7,11 +7,11 @@
     <title>BlackScreen Tool - Tela Preta & Desktop Virtual para Unlockers</title>
     <meta name="description" content="BlackScreen Tool - Crie áreas de trabalho virtuais, escureça a tela do cliente com mensagem personalizada e logo animado para atendimentos de unlock com total sigilo.">
     <link rel="icon" type="image/png" href="img/logo.png">
-    <link rel="stylesheet" href="css/main.css?v=5.0">
-    <link rel="stylesheet" href="css/landing.css?v=5.0">
-    <link rel="stylesheet" href="css/auth.css?v=5.0">
-    <link rel="stylesheet" href="css/dashboard.css?v=5.0">
-    <link rel="stylesheet" href="css/admin.css?v=5.0">
+    <link rel="stylesheet" href="css/main.css?v=6.0">
+    <link rel="stylesheet" href="css/landing.css?v=6.0">
+    <link rel="stylesheet" href="css/auth.css?v=6.0">
+    <link rel="stylesheet" href="css/dashboard.css?v=6.0">
+    <link rel="stylesheet" href="css/admin.css?v=6.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
@@ -24,28 +24,17 @@
         <div class="grid-overlay"></div>
     </div>
 
-    <!-- App SPA Container (Mounted via Component Classes) -->
+    <!-- Main Dynamic Application Container -->
     <div id="app"></div>
+
+    <!-- Modal Root Container (Rendered On Demand) -->
+    <div id="modal-root"></div>
 
     <!-- Toast Notifications Container -->
     <div id="toast" class="toast"></div>
 
-    <!-- Core Security & Utility Helpers -->
-    <script src="js/utils.js?v=5.0"></script>
-    <script src="js/api.js?v=5.0"></script>
-
-    <!-- Component Templates -->
-    <script src="js/components/LandingComponent.js?v=5.0"></script>
-    <script src="js/components/AuthModalComponent.js?v=5.0"></script>
-    <script src="js/components/AdminComponent.js?v=5.0"></script>
-    <script src="js/components/DashboardComponent.js?v=5.0"></script>
-
-    <!-- Business Logic Services -->
-    <script src="js/auth.js?v=5.0"></script>
-    <script src="js/dashboard.js?v=5.0"></script>
-    <script src="js/build.js?v=5.0"></script>
-    <script src="js/admin.js?v=5.0"></script>
-    <script src="js/app.js?v=5.0"></script>
+    <!-- Single Main Entry Point Script -->
+    <script src="js/bundle.js?v=6.0"></script>
 </body>
 
 </html>
