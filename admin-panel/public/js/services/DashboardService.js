@@ -105,7 +105,7 @@ class DashboardService {
     }
 
     getStatusLabel(status) {
-        const labels = { pending: 'Pendente', building: 'Compilando', completed: 'Concluído', failed: 'Falhou' };
+        const labels = { queued: 'Na Fila', pending: 'Pendente', building: 'Compilando', completed: 'Concluído', failed: 'Falhou' };
         return labels[status] || status;
     }
 

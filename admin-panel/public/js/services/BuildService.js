@@ -120,24 +120,70 @@ class BuildService {
             const buildNameInput = document.getElementById('buildName');
             const buildName = (buildNameInput?.value || '').trim();
             if (!buildName) return Utils.showToast('Informe um nome para a sua build.', 'error');
+            
             buildBtn.disabled = true;
-            Utils.showToast('Gerando compilado seguro... Por favor aguarde.', 'info');
+            Utils.showToast('⏳ Adicionando build à fila de compilação...', 'info');
+
             try {
                 const CorrectPassword = document.getElementById('correctPassword')?.value || '';
                 const CustomMessage = document.getElementById('customMessage')?.value || '';
                 const result = await API.post('/api/build/generate', { buildName, CorrectPassword, CustomMessage });
-                Utils.showToast('🎉 Build gerado com sucesso!', 'success');
+                
                 if (buildNameInput) buildNameInput.value = '';
                 this.loadBuildLimit();
                 Dashboard.loadRecentBuilds();
                 Dashboard.loadHistory();
-                if (result.downloadUrl) window.location.href = result.downloadUrl;
+
+                if (result.buildId) {
+                    Utils.showToast(`🚀 Build #${result.buildId} adicionado à fila! Aguarde a conclusão...`, 'info');
+                    this.pollBuildStatus(result.buildId);
+                } else {
+                    Utils.showToast('Build enviado para compilação.', 'info');
+                    buildBtn.disabled = false;
+                }
             } catch (error) {
                 Utils.showToast(error.message, 'error');
-            } finally {
                 buildBtn.disabled = false;
             }
         });
+    }
+
+    pollBuildStatus(buildId) {
+        const buildBtn = document.getElementById('startBuild');
+        const pollInterval = setInterval(async () => {
+            try {
+                const statusData = await API.get(`/api/build/status/${buildId}`);
+                const { status, queuePosition, downloadUrl } = statusData;
+
+                Dashboard.loadRecentBuilds();
+                Dashboard.loadHistory();
+
+                if (status === 'queued') {
+                    const posMsg = queuePosition ? ` (Posição na fila: #${queuePosition})` : '';
+                    Utils.showToast(`⏳ Build #${buildId} aguardando na fila...${posMsg}`, 'info');
+                } else if (status === 'building') {
+                    Utils.showToast(`⚙️ Build #${buildId} está sendo compilado pelo Worker em segundo plano...`, 'info');
+                } else if (status === 'completed') {
+                    clearInterval(pollInterval);
+                    if (buildBtn) buildBtn.disabled = false;
+                    Utils.showToast(`🎉 Build #${buildId} concluído com sucesso! Baixando seu executável...`, 'success');
+                    this.loadBuildLimit();
+                    
+                    if (downloadUrl) {
+                        window.location.href = downloadUrl;
+                    } else {
+                        window.location.href = `/api/build/download/${buildId}?token=${encodeURIComponent(API.token)}`;
+                    }
+                } else if (status === 'failed') {
+                    clearInterval(pollInterval);
+                    if (buildBtn) buildBtn.disabled = false;
+                    Utils.showToast(`❌ Falha na compilação do Build #${buildId}. Verifique os logs.`, 'error');
+                    this.loadBuildLimit();
+                }
+            } catch (err) {
+                console.error('[BuildService] Status poll error:', err);
+            }
+        }, 2500);
     }
 }
 

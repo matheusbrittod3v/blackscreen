@@ -3,12 +3,12 @@ const multer = require('multer');
 const archiver = require('archiver');
 const fs = require('fs-extra');
 const path = require('path');
-const { exec } = require('child_process');
 const router = express.Router();
 const { authMiddleware } = require('../middleware/auth');
 const buildRepository = require('../infrastructure/repositories/BuildRepository');
 const userSettingsRepository = require('../infrastructure/repositories/UserSettingsRepository');
 const activityLogRepository = require('../infrastructure/repositories/ActivityLogRepository');
+const buildQueue = require('../infrastructure/jobs/BuildQueue');
 
 const projectRoot = path.join(__dirname, '..', '..', '..');
 const globalUtilPath = path.join(projectRoot, 'util');
@@ -61,9 +61,6 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
-
-// Simple mutex to prevent concurrent builds from conflicting on C# template modification
-let isBuildInProgress = false;
 
 // Get current user's isolated settings
 router.get('/settings', async (req, res) => {
@@ -157,8 +154,8 @@ router.get('/build-limit', async (req, res) => {
     }
 });
 
-// Build process (Isolated workspace & file output)
-router.post('/build', async (req, res) => {
+// Event-driven async build queue trigger handler
+async function handleBuildEnqueue(req, res) {
     try {
         // Check build limit
         const buildsThisMonth = await buildRepository.countByUserThisMonth(req.user.id);
@@ -171,125 +168,94 @@ router.post('/build', async (req, res) => {
             });
         }
 
-        if (isBuildInProgress) {
-            return res.status(429).json({
-                error: 'Existe outro processo de compilação em andamento. Aguarde alguns instantes.'
-            });
-        }
+        const buildName = (req.body.buildName || '').trim() || `Build-${req.user.id}-${Date.now()}`;
 
-        isBuildInProgress = true;
-        console.log(`Starting isolated build for user #${req.user.id} (${req.user.email})...`);
-
-        // Load user settings
+        // Load user settings or request body overrides
         const userSettings = await userSettingsRepository.findByUserId(req.user.id);
         const { userUtil, userBuilds } = await ensureUserStorage(req.user.id);
 
-        const passwordToUse = userSettings.correctPassword || '';
-        const messageToUse = userSettings.customMessage || '';
+        const passwordToUse = req.body.CorrectPassword !== undefined ? req.body.CorrectPassword : (userSettings.correctPassword || '');
+        const messageToUse = req.body.CustomMessage !== undefined ? req.body.CustomMessage : (userSettings.customMessage || '');
 
-        // Create build record
+        // 1. Create initial build record with status 'queued'
         const build = await buildRepository.create({
             userId: req.user.id,
-            buildName: `Build-${req.user.id}-${Date.now()}`,
+            buildName,
             passwordUsed: passwordToUse,
             customMessage: messageToUse,
-            status: 'building'
+            status: 'queued'
         });
 
-        // 1. Prepare user's util folder and sync into build environment
-        await fs.copy(userUtil, globalUtilPath);
+        // 2. Enqueue job into Event-driven BuildQueue
+        const job = buildQueue.enqueue({
+            buildId: build.id,
+            userId: req.user.id,
+            userEmail: req.user.email,
+            buildName,
+            passwordToUse,
+            messageToUse,
+            userUtil,
+            userBuilds,
+            ip: req.ip
+        });
 
-        // 2. Prepare util.zip for compilation embedding
-        const utilZipPath = path.join(projectRoot, 'util.zip');
-        await zipFolder(userUtil, utilZipPath);
+        // 3. Log activity
+        await activityLogRepository.create({
+            userId: req.user.id,
+            action: 'BUILD_QUEUED',
+            description: `Build #${build.id} (${buildName}) adicionado à fila de compilação`,
+            ipAddress: req.ip,
+            metadata: { buildId: build.id }
+        });
 
-        // 3. Inject user's specific settings into MainWindow.xaml.cs
-        const mainWinPath = path.join(projectRoot, 'MainWindow.xaml.cs');
-        if (await fs.pathExists(mainWinPath)) {
-            let content = await fs.readFile(mainWinPath, 'utf8');
+        const queuePosition = buildQueue.getPosition(build.id);
 
-            const escapeCSharp = (str) => {
-                return (str || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
-            };
+        // 4. Return instant non-blocking response with job info
+        res.status(202).json({
+            message: 'Build adicionado à fila de compilação com sucesso!',
+            buildId: build.id,
+            status: 'queued',
+            queuePosition
+        });
+    } catch (err) {
+        console.error('Build queue trigger error:', err);
+        res.status(500).json({ error: 'Falha ao adicionar build à fila.' });
+    }
+}
 
-            const escapedPassword = escapeCSharp(passwordToUse);
-            const escapedMessage = escapeCSharp(messageToUse);
+// POST endpoints for initiating a build job
+router.post('/generate', handleBuildEnqueue);
+router.post('/build', handleBuildEnqueue);
 
-            content = content.replace(
-                /public string CorrectPassword \{ get; set; } = ".*?";/,
-                `public string CorrectPassword { get; set; } = "${escapedPassword}";`
-            );
-            content = content.replace(
-                /public string CustomMessage \{ get; set; } = ".*?";/,
-                `public string CustomMessage { get; set; } = "${escapedMessage}";`
-            );
-            content = content.replace(
-                /private string _correctPassword = ".*?";/,
-                `private string _correctPassword = "${escapedPassword}";`
-            );
-
-            await fs.writeFile(mainWinPath, content, 'utf8');
+// Real-time job status query endpoint
+router.get('/status/:buildId', async (req, res) => {
+    try {
+        const build = await buildRepository.findById(req.params.buildId);
+        if (!build) {
+            return res.status(404).json({ error: 'Build não encontrado.' });
         }
 
-        const publishCmd = 'dotnet publish -c Release -r win-x64 --self-contained false -p:EnableWindowsTargeting=true';
+        // Strict isolation check
+        if (!req.user.isAdmin() && build.userId !== req.user.id) {
+            return res.status(403).json({ error: 'Acesso negado: este build pertence a outro usuário.' });
+        }
 
-        exec(publishCmd, { cwd: projectRoot }, async (error, stdout, stderr) => {
-            isBuildInProgress = false;
+        const queuePosition = buildQueue.getPosition(build.id);
 
-            if (error) {
-                console.error(`dotnet publish error: ${error}`);
-                await buildRepository.update(build.id, {
-                    status: 'failed',
-                    completedAt: new Date()
-                });
-                return res.status(500).json({ error: 'Falha na compilação do executável.', details: stderr });
-            }
-
-            console.log(`Compilation success for build #${build.id}`);
-
-            const publishDir = path.join(projectRoot, 'bin', 'Release', 'net9.0-windows', 'win-x64', 'publish');
-            const userBuildZip = path.join(userBuilds, `${build.id}.zip`);
-            const fallbackGlobalZip = path.join(projectRoot, 'dist_output.zip');
-
-            if (await fs.pathExists(publishDir)) {
-                // Generate isolated zip for this specific user and build
-                await zipFolder(publishDir, userBuildZip);
-                await fs.copy(userBuildZip, fallbackGlobalZip).catch(() => {});
-
-                const stats = await fs.stat(userBuildZip);
-
-                await buildRepository.update(build.id, {
-                    status: 'completed',
-                    fileSize: stats.size,
-                    completedAt: new Date()
-                });
-
-                await activityLogRepository.create({
-                    userId: req.user.id,
-                    action: 'BUILD_COMPLETED',
-                    description: `Build #${build.id} concluído com sucesso`,
-                    ipAddress: req.ip,
-                    metadata: { buildId: build.id, fileSize: stats.size }
-                });
-
-                res.json({
-                    message: 'Build concluído com sucesso! Baixe seu pacote isolado.',
-                    downloadUrl: `/api/build/download/${build.id}`,
-                    buildId: build.id
-                });
-            } else {
-                await buildRepository.update(build.id, {
-                    status: 'failed',
-                    completedAt: new Date()
-                });
-                res.status(500).json({ error: 'Diretório de saída não encontrado: ' + publishDir });
-            }
+        res.json({
+            buildId: build.id,
+            buildName: build.buildName,
+            status: build.status,
+            queuePosition,
+            fileSize: build.fileSize,
+            downloadCount: build.downloadCount,
+            createdAt: build.createdAt,
+            completedAt: build.completedAt,
+            downloadUrl: build.status === 'completed' ? `/api/build/download/${build.id}?token=${encodeURIComponent(req.token || '')}` : null
         });
-
-    } catch (err) {
-        isBuildInProgress = false;
-        console.error('Build trigger error:', err);
-        res.status(500).json({ error: 'Processo de build falhou' });
+    } catch (error) {
+        console.error('Error fetching build status:', error);
+        res.status(500).json({ error: 'Erro ao consultar status do build' });
     }
 });
 
@@ -359,19 +325,5 @@ router.get('/history', async (req, res) => {
         res.status(500).json({ error: 'Erro ao buscar histórico' });
     }
 });
-
-function zipFolder(sourceDir, outPath) {
-    return new Promise((resolve, reject) => {
-        const output = fs.createWriteStream(outPath);
-        const archive = archiver('zip', { zlib: { level: 9 } });
-
-        output.on('close', resolve);
-        archive.on('error', reject);
-
-        archive.pipe(output);
-        archive.directory(sourceDir, false);
-        archive.finalize();
-    });
-}
 
 module.exports = router;

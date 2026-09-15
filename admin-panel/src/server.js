@@ -77,6 +77,10 @@ async function start() {
         connection.release();
         console.log('✅ Database connected and migrated');
 
+        // Initialize Event-Driven Build Worker
+        const buildWorker = require('./infrastructure/jobs/BuildWorker');
+        buildWorker.init();
+
         app.listen(port, host, () => {
             console.log(`\n🚀 Black Tool Admin Panel running at http://${host}:${port} (http://localhost:${port})`);
             console.log(`\n📝 Credenciais do Administrador Padrão:`);
