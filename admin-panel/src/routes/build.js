@@ -211,6 +211,42 @@ router.get('/build-limit', async (req, res) => {
     }
 });
 
+// Serve and download user's isolated custom asset files (logo.png, logo.ico, logo.gif)
+router.get('/assets/:file', async (req, res) => {
+    try {
+        const allowedFiles = ['logo.png', 'logo.ico', 'logo.gif'];
+        const fileName = req.params.file;
+
+        if (!allowedFiles.includes(fileName)) {
+            return res.status(400).json({ error: 'Arquivo inválido.' });
+        }
+
+        const { userUtil } = await ensureUserStorage(req.user.id);
+        const userFilePath = path.join(userUtil, fileName);
+        const globalFilePath = path.join(globalUtilPath, fileName);
+
+        let targetPath = null;
+        if (await fs.pathExists(userFilePath)) {
+            targetPath = userFilePath;
+        } else if (await fs.pathExists(globalFilePath)) {
+            targetPath = globalFilePath;
+        }
+
+        if (!targetPath) {
+            return res.status(404).json({ error: `Arquivo ${fileName} não encontrado.` });
+        }
+
+        if (req.query.download === '1') {
+            res.download(targetPath, fileName);
+        } else {
+            res.sendFile(targetPath);
+        }
+    } catch (error) {
+        console.error('Error serving asset:', error);
+        res.status(500).json({ error: 'Erro ao carregar arquivo de logo/ícone' });
+    }
+});
+
 // Event-driven async build queue trigger handler
 async function handleBuildEnqueue(req, res) {
     try {

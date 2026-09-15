@@ -60,13 +60,28 @@ class Utils {
         const toast = document.getElementById('toast');
         if (!toast) return;
 
-        toast.textContent = String(message || '');
+        const text = String(message || '');
+        toast.innerHTML = `
+            <span>${text}</span>
+            <button type="button" class="toast-close" onclick="Utils.hideToast()" title="Fechar">&times;</button>
+        `;
         toast.className = `toast ${type} show`;
 
         if (this._toastTimer) clearTimeout(this._toastTimer);
         this._toastTimer = setTimeout(() => {
+            this.hideToast();
+        }, 4000);
+    }
+
+    /**
+     * Hide toast notification immediately
+     */
+    static hideToast() {
+        const toast = document.getElementById('toast');
+        if (toast) {
             toast.classList.remove('show');
-        }, 3500);
+        }
+        if (this._toastTimer) clearTimeout(this._toastTimer);
     }
 }
 

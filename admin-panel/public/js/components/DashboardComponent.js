@@ -159,6 +159,7 @@ class DashboardComponent {
                                             </div>
                                             <input type="file" id="file-png" hidden accept=".png">
                                         </div>
+                                        <button type="button" class="btn-table-action" style="margin-top:6px;width:100%;" onclick="Build.downloadAsset('logo.png')">📥 Baixar PNG</button>
                                     </div>
                                     <div class="upload-item">
                                         <label>Ícone Executável (ICO) <span style="font-size:0.7rem;color:var(--text-muted);">(ou gerado do PNG)</span></label>
@@ -169,6 +170,7 @@ class DashboardComponent {
                                             </div>
                                             <input type="file" id="file-ico" hidden accept=".ico">
                                         </div>
+                                        <button type="button" class="btn-table-action" style="margin-top:6px;width:100%;" onclick="Build.downloadAsset('logo.ico')">📥 Baixar ICO</button>
                                     </div>
                                     <div class="upload-item">
                                         <label>Logo Animada (GIF)</label>
@@ -179,6 +181,7 @@ class DashboardComponent {
                                             </div>
                                             <input type="file" id="file-gif" hidden accept=".gif">
                                         </div>
+                                        <button type="button" class="btn-table-action" style="margin-top:6px;width:100%;" onclick="Build.downloadAsset('logo.gif')">📥 Baixar GIF</button>
                                     </div>
                                 </div>
                                 <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">

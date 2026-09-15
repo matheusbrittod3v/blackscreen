@@ -129,6 +129,12 @@ class BuildService {
         }
     }
 
+    downloadAsset(fileName) {
+        if (!API.token) return Utils.showToast('Você precisa estar autenticado para baixar.', 'error');
+        Utils.showToast(`📥 Baixando ${fileName}...`, 'info');
+        window.location.href = `/api/build/assets/${encodeURIComponent(fileName)}?download=1&token=${encodeURIComponent(API.token)}`;
+    }
+
     setupBuild() {
         const buildBtn = document.getElementById('startBuild');
         if (!buildBtn) return;
@@ -166,30 +172,40 @@ class BuildService {
 
     pollBuildStatus(buildId) {
         const buildBtn = document.getElementById('startBuild');
+        let lastStateKey = '';
+
         const pollInterval = setInterval(async () => {
             try {
                 const statusData = await API.get(`/api/build/status/${buildId}`);
                 const { status, queuePosition, downloadUrl } = statusData;
+                const currentStateKey = `${status}:${queuePosition}`;
 
                 Dashboard.loadRecentBuilds();
                 Dashboard.loadHistory();
 
-                if (status === 'queued') {
-                    const posMsg = queuePosition ? ` (Posição na fila: #${queuePosition})` : '';
-                    Utils.showToast(`⏳ Build #${buildId} aguardando na fila...${posMsg}`, 'info');
-                } else if (status === 'building') {
-                    Utils.showToast(`⚙️ Build #${buildId} está sendo compilado pelo Worker em segundo plano...`, 'info');
-                } else if (status === 'completed') {
+                if (currentStateKey !== lastStateKey) {
+                    lastStateKey = currentStateKey;
+                    if (status === 'queued') {
+                        const posMsg = queuePosition ? ` (Posição: #${queuePosition})` : '';
+                        Utils.showToast(`⏳ Build #${buildId} na fila...${posMsg}`, 'info');
+                    } else if (status === 'building') {
+                        Utils.showToast(`⚙️ Compilando Build #${buildId} em segundo plano...`, 'info');
+                    }
+                }
+
+                if (status === 'completed') {
                     clearInterval(pollInterval);
                     if (buildBtn) buildBtn.disabled = false;
-                    Utils.showToast(`🎉 Build #${buildId} concluído com sucesso! Baixando seu executável...`, 'success');
+                    Utils.showToast(`🎉 Build #${buildId} concluído com sucesso! Baixando executável...`, 'success');
                     this.loadBuildLimit();
                     
-                    if (downloadUrl) {
-                        window.location.href = downloadUrl;
-                    } else {
-                        window.location.href = `/api/build/download/${buildId}?token=${encodeURIComponent(API.token)}`;
-                    }
+                    setTimeout(() => {
+                        if (downloadUrl) {
+                            window.location.href = downloadUrl;
+                        } else {
+                            window.location.href = `/api/build/download/${buildId}?token=${encodeURIComponent(API.token)}`;
+                        }
+                    }, 500);
                 } else if (status === 'failed') {
                     clearInterval(pollInterval);
                     if (buildBtn) buildBtn.disabled = false;
