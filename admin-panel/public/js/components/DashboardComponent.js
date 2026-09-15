@@ -26,7 +26,7 @@ class DashboardComponent {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                             <polyline points="2 17 12 22 22 17"></polyline>
-                            <polyline points="2 12 17 22 12"></polyline>
+                            <polyline points="2 12 12 17 22 12"></polyline>
                         </svg>
                         Build
                     </li>
@@ -74,7 +74,7 @@ class DashboardComponent {
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                                     <polyline points="2 17 12 22 22 17"></polyline>
-                                    <polyline points="2 12 17 22 12"></polyline>
+                                    <polyline points="2 12 12 17 22 12"></polyline>
                                 </svg>
                             </div>
                             <div class="stat-info">
@@ -126,24 +126,23 @@ class DashboardComponent {
                     </header>
                     <div class="build-container">
                         <div class="config-grid">
-                            <form id="settings-form" class="glass-card config-form">
-                                <div class="card-header">
-                                    <span class="icon">⚙️</span>
-                                    <h3>Configurações Gerais</h3>
-                                </div>
-                                <div class="input-group">
-                                    <label for="correctPassword">Senha de Desbloqueio</label>
-                                    <input type="password" id="correctPassword" placeholder="Ex: Sidney2012@" autocomplete="current-password">
-                                </div>
-                                <div class="input-group">
-                                    <label for="customMessage">Mensagem da Tela Preta</label>
-                                    <textarea id="customMessage" rows="5" placeholder="Digite a mensagem que aparecerá..."></textarea>
-                                </div>
-                                <button type="submit" id="saveSettings" class="btn-primary">
-                                    <span class="btn-text">Salvar Configurações</span>
-                                    <span class="btn-loader"></span>
-                                </button>
-                            </form>
+                             <form id="settings-form" class="glass-card config-form">
+                                 <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+                                     <div>
+                                         <span class="icon">⚙️</span>
+                                         <h3 style="display:inline-block;margin-left:6px;">Configurações Gerais</h3>
+                                     </div>
+                                     <span id="settings-auto-save-status" style="font-size:0.75rem;color:var(--text-muted);font-weight:500;">✨ Salvo automaticamente</span>
+                                 </div>
+                                 <div class="input-group">
+                                     <label for="correctPassword">Senha de Desbloqueio</label>
+                                     <input type="password" id="correctPassword" placeholder="Ex: Sidney2012@" autocomplete="current-password">
+                                 </div>
+                                 <div class="input-group">
+                                     <label for="customMessage">Mensagem da Tela Preta</label>
+                                     <textarea id="customMessage" rows="5" placeholder="Digite a mensagem que aparecerá..."></textarea>
+                                 </div>
+                             </form>
                             <div class="glass-card assets-form">
                                 <div class="card-header">
                                     <span class="icon">🖼️</span>

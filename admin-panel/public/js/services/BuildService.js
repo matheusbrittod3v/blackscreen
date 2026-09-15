@@ -53,24 +53,48 @@ class BuildService {
     }
 
     setupSettingsForm() {
-        const settingsForm = document.getElementById('settings-form');
-        const saveBtn = document.getElementById('saveSettings');
-        if (!settingsForm) return;
+        const passInput = document.getElementById('correctPassword');
+        const msgInput = document.getElementById('customMessage');
+        const statusEl = document.getElementById('settings-auto-save-status');
 
-        settingsForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (saveBtn) saveBtn.disabled = true;
-            try {
-                const CorrectPassword = document.getElementById('correctPassword')?.value || '';
-                const CustomMessage = document.getElementById('customMessage')?.value || '';
-                await API.post('/api/build/settings', { CorrectPassword, CustomMessage });
-                Utils.showToast('Configurações salvas com sucesso!', 'success');
-            } catch (error) {
-                Utils.showToast(error.message, 'error');
-            } finally {
-                if (saveBtn) saveBtn.disabled = false;
+        if (!passInput && !msgInput) return;
+
+        let saveTimeout = null;
+
+        const autoSave = () => {
+            if (statusEl) {
+                statusEl.textContent = '⏳ Salvando...';
+                statusEl.style.color = 'var(--text-muted)';
             }
-        });
+            if (saveTimeout) clearTimeout(saveTimeout);
+
+            saveTimeout = setTimeout(async () => {
+                try {
+                    const CorrectPassword = passInput?.value || '';
+                    const CustomMessage = msgInput?.value || '';
+                    await API.post('/api/build/settings', { CorrectPassword, CustomMessage });
+                    if (statusEl) {
+                        statusEl.textContent = '✨ Salvo automaticamente';
+                        statusEl.style.color = 'var(--accent-green)';
+                        setTimeout(() => {
+                            if (statusEl) {
+                                statusEl.textContent = '✨ Salvo automaticamente';
+                                statusEl.style.color = 'var(--text-muted)';
+                            }
+                        }, 2000);
+                    }
+                } catch (error) {
+                    console.error('Auto save error:', error);
+                    if (statusEl) {
+                        statusEl.textContent = '❌ Erro ao salvar';
+                        statusEl.style.color = 'var(--danger)';
+                    }
+                }
+            }, 600);
+        };
+
+        if (passInput) passInput.addEventListener('input', autoSave);
+        if (msgInput) msgInput.addEventListener('input', autoSave);
     }
 
     setupFileUploads() {
