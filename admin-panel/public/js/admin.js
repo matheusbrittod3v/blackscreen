@@ -1,4 +1,6 @@
-// Admin Module
+/**
+ * Admin Module - Client & Audit Management Panel
+ */
 const Admin = {
     init() {
         this.setupTabs();
@@ -21,7 +23,6 @@ const Admin = {
                     content.classList.toggle('active', content.id === `${target}-tab`);
                 });
 
-                // Load tab data
                 switch (target) {
                     case 'users':
                         this.loadUsers();
@@ -80,12 +81,12 @@ const Admin = {
             const limitEl = document.getElementById('modal-user-limit');
             const activeEl = document.getElementById('modal-user-active');
 
-            if (nameEl) nameEl.value = user.name;
-            if (emailEl) emailEl.value = user.email;
+            if (nameEl) nameEl.value = user.name || '';
+            if (emailEl) emailEl.value = user.email || '';
             if (passEl) passEl.value = '';
-            if (roleEl) roleEl.value = user.role;
-            if (limitEl) limitEl.value = user.monthlyBuildLimit;
-            if (activeEl) activeEl.value = user.isActive.toString();
+            if (roleEl) roleEl.value = user.role || 'user';
+            if (limitEl) limitEl.value = user.monthlyBuildLimit ?? 5;
+            if (activeEl) activeEl.value = (user.isActive !== false).toString();
         } else {
             if (title) title.textContent = 'Novo Cliente';
             const passEl = document.getElementById('modal-user-password');
@@ -106,60 +107,57 @@ const Admin = {
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = form.querySelector('button[type="submit"]');
-            if (btn) btn.classList.add('loading');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            const editId = document.getElementById('edit-user-id')?.value;
+            const name = (document.getElementById('modal-user-name')?.value || '').trim();
+            const email = (document.getElementById('modal-user-email')?.value || '').trim();
+            const password = document.getElementById('modal-user-password')?.value || '';
+            const role = document.getElementById('modal-user-role')?.value || 'user';
+            const monthlyBuildLimit = parseInt(document.getElementById('modal-user-limit')?.value || '5', 10);
+            const isActive = document.getElementById('modal-user-active')?.value === 'true';
 
             try {
-                const id = document.getElementById('edit-user-id').value;
-                const userData = {
-                    name: document.getElementById('modal-user-name').value,
-                    email: document.getElementById('modal-user-email').value,
-                    role: document.getElementById('modal-user-role').value,
-                    monthlyBuildLimit: parseInt(document.getElementById('modal-user-limit').value),
-                    isActive: document.getElementById('modal-user-active').value === 'true'
-                };
-
-                const password = document.getElementById('modal-user-password').value;
-                console.log('UserData being sent:', userData);
-                console.log('Password length:', password ? password.length : 0);
-                if (password) {
-                    userData.password = password;
-                }
-
-                if (id) {
-                    await API.put(`/api/admin/users/${id}`, userData);
-                    showToast('Cliente atualizado com sucesso!', 'success');
+                if (editId) {
+                    const updateData = { name, email, role, monthlyBuildLimit, isActive };
+                    if (password) updateData.password = password;
+                    await API.put(`/api/admin/users/${editId}`, updateData);
+                    Utils.showToast('Cliente atualizado com sucesso!', 'success');
                 } else {
                     if (!password) {
-                        throw new Error('Senha é obrigatória para novos clientes');
+                        throw new Error('Senha é obrigatória para cadastrar novo usuário.');
                     }
-                    await API.post('/api/admin/users', userData);
-                    showToast('Cliente criado com sucesso!', 'success');
+                    await API.post('/api/admin/users', { name, email, password, role, monthlyBuildLimit, isActive });
+                    Utils.showToast('Novo cliente cadastrado com sucesso!', 'success');
                 }
-
                 this.closeModal();
                 this.loadUsers();
                 this.loadDashboard();
             } catch (error) {
-                showToast(error.message, 'error');
+                Utils.showToast(error.message, 'error');
             } finally {
-                btn.classList.remove('loading');
+                if (submitBtn) submitBtn.disabled = false;
             }
         });
     },
 
     async loadDashboard() {
-        try {
-            const data = await API.get('/api/admin/dashboard');
+        if (Auth.currentUser?.role !== 'admin') return;
 
-            document.getElementById('admin-total-users').textContent = data.stats.totalUsers;
-            document.getElementById('admin-total-builds').textContent = data.stats.totalBuilds;
-            document.getElementById('admin-builds-month').textContent = data.stats.buildsThisMonth;
-            document.getElementById('admin-total-admins').textContent = data.stats.adminCount;
+        try {
+            const stats = await API.get('/api/admin/stats');
+            const totalUsersEl = document.getElementById('admin-total-users');
+            const totalBuildsEl = document.getElementById('admin-total-builds');
+            const activeUsersEl = document.getElementById('admin-active-users');
+
+            if (totalUsersEl) totalUsersEl.textContent = stats.totalUsers ?? 0;
+            if (totalBuildsEl) totalBuildsEl.textContent = stats.totalBuilds ?? 0;
+            if (activeUsersEl) activeUsersEl.textContent = stats.activeUsers ?? 0;
 
             this.loadUsers();
         } catch (error) {
-            console.error('Error loading admin dashboard:', error);
+            console.error('[Admin] Error loading admin stats:', error);
         }
     },
 
@@ -167,63 +165,59 @@ const Admin = {
         try {
             const users = await API.get('/api/admin/users');
             const tbody = document.getElementById('users-table-body');
+            if (!tbody) return;
 
-            if (users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-message">Nenhum usuário encontrado.</td></tr>';
+            if (!Array.isArray(users) || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-message">Nenhum cliente cadastrado.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = users.map(user => `
-                <tr>
-                    <td>#${user.id}</td>
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td><span class="role-badge ${user.role}">${user.role === 'admin' ? 'Admin' : 'Usuário'}</span></td>
-                    <td>${user.monthlyBuildLimit}</td>
-                    <td>${user.buildsThisMonth || 0} / ${user.monthlyBuildLimit}</td>
-                    <td><span class="active-badge ${user.isActive ? 'active' : 'inactive'}">${user.isActive ? 'Ativo' : 'Inativo'}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-icon edit" onclick="Admin.editUser(${user.id})" title="Editar">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                </svg>
-                            </button>
-                            <button class="btn-icon delete" onclick="Admin.deleteUser(${user.id})" title="Excluir">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = users.map(u => {
+                const safeId = Utils.escapeHtml(u.id);
+                const safeName = Utils.escapeHtml(u.name);
+                const safeEmail = Utils.escapeHtml(u.email);
+                const safeRole = Utils.escapeHtml(u.role === 'admin' ? 'Administrador' : 'Membro');
+                const safeLimit = Utils.escapeHtml(u.monthlyBuildLimit ?? 5);
+                const isActive = u.isActive !== false;
+                const statusBadge = isActive
+                    ? '<span class="status-badge completed">Ativo</span>'
+                    : '<span class="status-badge failed">Desativado</span>';
+
+                const safeUserJson = Utils.escapeHtml(JSON.stringify(u));
+
+                return `
+                    <tr>
+                        <td>#${safeId}</td>
+                        <td><strong>${safeName}</strong></td>
+                        <td>${safeEmail}</td>
+                        <td>${safeRole}</td>
+                        <td>${safeLimit} builds/mês</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button type="button" class="btn-table-action" onclick='Admin.editUserFromData(${safeUserJson})'>Editar</button>
+                            <button type="button" class="btn-table-action danger" onclick="Admin.deleteUser(${safeId})">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         } catch (error) {
-            console.error('Error loading users:', error);
+            console.error('[Admin] Error loading users:', error);
         }
     },
 
-    async editUser(id) {
-        try {
-            const user = await API.get(`/api/admin/users/${id}`);
-            this.openModal(user);
-        } catch (error) {
-            showToast('Erro ao carregar usuário', 'error');
-        }
+    editUserFromData(user) {
+        this.openModal(user);
     },
 
-    async deleteUser(id) {
-        if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
-
+    async deleteUser(userId) {
+        if (!confirm('Tem certeza que deseja excluir este cliente? Essa ação é irreversível.')) return;
         try {
-            await API.delete(`/api/admin/users/${id}`);
-            showToast('Usuário excluído com sucesso!', 'success');
+            await API.delete(`/api/admin/users/${userId}`);
+            Utils.showToast('Cliente excluído com sucesso.', 'success');
             this.loadUsers();
             this.loadDashboard();
         } catch (error) {
-            showToast(error.message, 'error');
+            Utils.showToast(error.message, 'error');
         }
     },
 
@@ -231,68 +225,77 @@ const Admin = {
         try {
             const builds = await API.get('/api/admin/builds');
             const tbody = document.getElementById('admin-builds-table-body');
+            if (!tbody) return;
 
-            if (builds.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-message">Nenhum build encontrado.</td></tr>';
+            if (!Array.isArray(builds) || builds.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-message">Nenhum build no histórico do sistema.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = builds.map(build => `
-                <tr>
-                    <td>#${build.id}</td>
-                    <td>${build.userName || '-'}</td>
-                    <td>${build.buildName || '-'}</td>
-                    <td><span class="status-badge ${build.status}">${Dashboard.getStatusLabel(build.status)}</span></td>
-                    <td>${formatFileSize(build.fileSize)}</td>
-                    <td>${build.downloadCount || 0}</td>
-                    <td>${formatDate(build.createdAt)}</td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = builds.map(b => {
+                const safeId = Utils.escapeHtml(b.id);
+                const safeUser = Utils.escapeHtml(b.User?.name || b.User?.email || `User #${b.userId}`);
+                const safeName = Utils.escapeHtml(b.buildName || '-');
+                const safeStatus = Utils.escapeHtml(b.status);
+                const safeSize = Utils.formatFileSize(b.fileSize);
+                const safeDate = Utils.formatDate(b.createdAt);
+                const statusLabel = Utils.escapeHtml(Dashboard.getStatusLabel(b.status));
+
+                return `
+                    <tr>
+                        <td>#${safeId}</td>
+                        <td><strong>${safeUser}</strong></td>
+                        <td>${safeName}</td>
+                        <td><span class="status-badge ${safeStatus}">${statusLabel}</span></td>
+                        <td>${safeSize}</td>
+                        <td>${safeDate}</td>
+                        <td>
+                            ${b.status === 'completed'
+                                ? `<a href="/api/build/download/${safeId}?token=${encodeURIComponent(API.token)}" class="btn-table-action" download>Baixar</a>`
+                                : '-'
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         } catch (error) {
-            console.error('Error loading builds:', error);
+            console.error('[Admin] Error loading admin builds:', error);
         }
     },
 
     async loadActivity() {
         try {
-            const activities = await API.get('/api/admin/activity');
+            const logs = await API.get('/api/admin/activity');
             const container = document.getElementById('activity-list');
+            if (!container) return;
 
-            if (activities.length === 0) {
+            if (!Array.isArray(logs) || logs.length === 0) {
                 container.innerHTML = '<p class="empty-message">Nenhuma atividade registrada.</p>';
                 return;
             }
 
-            container.innerHTML = activities.map(activity => `
-                <div class="activity-item">
-                    <div class="activity-icon ${this.getActivityIconClass(activity.action)}">
-                        ${this.getActivityIcon(activity.action)}
+            container.innerHTML = logs.map(l => {
+                const safeAction = Utils.escapeHtml(l.action);
+                const safeDesc = Utils.escapeHtml(l.description);
+                const safeUser = Utils.escapeHtml(l.User?.name || l.User?.email || 'Sistema');
+                const safeIp = Utils.escapeHtml(l.ipAddress || '-');
+                const safeDate = Utils.formatDate(l.createdAt);
+
+                return `
+                    <div class="activity-item" style="padding:12px 16px;border-bottom:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                        <div>
+                            <span class="status-badge info" style="margin-right:8px;">${safeAction}</span>
+                            <strong>${safeUser}</strong>: ${safeDesc}
+                        </div>
+                        <div style="text-align:right;font-size:0.75rem;color:var(--text-muted);">
+                            <div>${safeDate}</div>
+                            <div>IP: ${safeIp}</div>
+                        </div>
                     </div>
-                    <div class="activity-content">
-                        <span class="activity-title">${activity.userName || activity.userEmail || 'Sistema'}</span>
-                        <span class="activity-description">${activity.description || activity.action}</span>
-                    </div>
-                    <span class="activity-time">${relativeTime(activity.createdAt)}</span>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         } catch (error) {
-            console.error('Error loading activity:', error);
+            console.error('[Admin] Error loading activity logs:', error);
         }
-    },
-
-    getActivityIconClass(action) {
-        if (action.includes('LOGIN')) return 'login';
-        if (action.includes('REGISTER')) return 'register';
-        if (action.includes('BUILD')) return 'build';
-        if (action.includes('USER')) return 'user';
-        return '';
-    },
-
-    getActivityIcon(action) {
-        if (action.includes('LOGIN')) return '🔑';
-        if (action.includes('REGISTER')) return '👤';
-        if (action.includes('BUILD')) return '🚀';
-        if (action.includes('USER')) return '✏️';
-        return '📋';
     }
 };

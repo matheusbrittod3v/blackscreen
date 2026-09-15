@@ -1,4 +1,6 @@
-// Build Module
+/**
+ * Build Module - Custom EXE/Zip Generation Workspace
+ */
 const Build = {
     init() {
         this.setupSettingsForm();
@@ -19,7 +21,7 @@ const Build = {
                 if (msgInput) msgInput.value = settings.CustomMessage || '';
             }
         } catch (error) {
-            console.error('Error loading settings:', error);
+            console.error('[Build] Error loading build settings:', error);
         }
     },
 
@@ -48,10 +50,13 @@ const Build = {
                         warning.style.background = 'rgba(239, 68, 68, 0.1)';
                         warning.style.color = 'var(--danger)';
                     }
+                } else if (warning) {
+                    warning.innerHTML = '';
+                    if (buildBtn) buildBtn.disabled = false;
                 }
             }
         } catch (error) {
-            console.error('Error loading build limit:', error);
+            console.error('[Build] Error loading build limit:', error);
         }
     },
 
@@ -62,18 +67,18 @@ const Build = {
 
         settingsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (saveBtn) saveBtn.classList.add('loading');
+            if (saveBtn) saveBtn.disabled = true;
 
             try {
                 const CorrectPassword = document.getElementById('correctPassword')?.value || '';
                 const CustomMessage = document.getElementById('customMessage')?.value || '';
 
                 await API.post('/api/build/settings', { CorrectPassword, CustomMessage });
-                showToast('Configurações salvas com sucesso!', 'success');
+                Utils.showToast('Configurações salvas com sucesso!', 'success');
             } catch (error) {
-                showToast(error.message, 'error');
+                Utils.showToast(error.message, 'error');
             } finally {
-                if (saveBtn) saveBtn.classList.remove('loading');
+                if (saveBtn) saveBtn.disabled = false;
             }
         });
     },
@@ -81,7 +86,6 @@ const Build = {
     setupFileUploads() {
         const uploadBtn = document.getElementById('uploadAssets');
 
-        // File input visual feedback
         ['file-png', 'file-ico', 'file-gif'].forEach(id => {
             const input = document.getElementById(id);
             if (!input) return;
@@ -91,33 +95,33 @@ const Build = {
                 if (e.target.files.length > 0 && zone) {
                     zone.classList.add('selected');
                     const p = zone.querySelector('p');
-                    if (p) p.textContent = e.target.files[0].name;
+                    if (p) p.textContent = Utils.escapeHtml(e.target.files[0].name);
                 }
             });
         });
 
         if (uploadBtn) {
             uploadBtn.addEventListener('click', async () => {
-                const formData = new FormData();
-                const png = document.getElementById('file-png')?.files[0];
-                const ico = document.getElementById('file-ico')?.files[0];
-                const gif = document.getElementById('file-gif')?.files[0];
+                const pngFile = document.getElementById('file-png')?.files[0];
+                const icoFile = document.getElementById('file-ico')?.files[0];
+                const gifFile = document.getElementById('file-gif')?.files[0];
 
-                if (!png && !ico && !gif) {
-                    return showToast('Selecione pelo menos um arquivo', 'error');
+                if (!pngFile && !icoFile && !gifFile) {
+                    return Utils.showToast('Selecione ao menos um arquivo para enviar.', 'error');
                 }
-
-                if (png) formData.append('logo_png', png);
-                if (ico) formData.append('logo_ico', ico);
-                if (gif) formData.append('logo_gif', gif);
 
                 uploadBtn.disabled = true;
 
+                const formData = new FormData();
+                if (pngFile) formData.append('png', pngFile);
+                if (icoFile) formData.append('ico', icoFile);
+                if (gifFile) formData.append('gif', gifFile);
+
                 try {
-                    await API.upload('/api/build/upload', formData);
-                    showToast('Arquivos enviados com sucesso!', 'success');
+                    const result = await API.upload('/api/build/upload', formData);
+                    Utils.showToast(result.message || 'Arquivos enviados com sucesso!', 'success');
                 } catch (error) {
-                    showToast('Erro no upload', 'error');
+                    Utils.showToast(error.message, 'error');
                 } finally {
                     uploadBtn.disabled = false;
                 }
@@ -127,48 +131,39 @@ const Build = {
 
     setupBuild() {
         const buildBtn = document.getElementById('startBuild');
-        const buildStatus = document.getElementById('buildStatus');
-        const statusText = document.getElementById('statusText');
-        const progressFill = document.getElementById('progressFill');
-        const downloadArea = document.getElementById('downloadArea');
         if (!buildBtn) return;
 
         buildBtn.addEventListener('click', async () => {
+            const buildNameInput = document.getElementById('buildName');
+            const buildName = (buildNameInput?.value || '').trim();
+
+            if (!buildName) {
+                return Utils.showToast('Informe um nome para a sua build.', 'error');
+            }
+
             buildBtn.disabled = true;
-            if (buildStatus) buildStatus.classList.remove('hidden');
-            if (downloadArea) downloadArea.classList.add('hidden');
-            if (progressFill) progressFill.style.width = '10%';
-            if (statusText) statusText.textContent = 'Iniciando build...';
+            Utils.showToast('Gerando compilado seguro... Por favor aguarde.', 'info');
 
             try {
-                const timer = setInterval(() => {
-                    if (progressFill) {
-                        const currentWidth = parseInt(progressFill.style.width);
-                        if (currentWidth < 95) {
-                            const increment = Math.max(1, Math.floor((100 - currentWidth) / 10));
-                            progressFill.style.width = (currentWidth + increment) + '%';
-                        }
-                    }
-                }, 500);
+                const CorrectPassword = document.getElementById('correctPassword')?.value || '';
+                const CustomMessage = document.getElementById('customMessage')?.value || '';
 
-                const data = await API.post('/api/build/build', {});
+                const result = await API.post('/api/build/generate', {
+                    buildName, CorrectPassword, CustomMessage
+                });
 
-                clearInterval(timer);
-                if (progressFill) progressFill.style.width = '100%';
-                if (statusText) statusText.textContent = 'Build concluído!';
+                Utils.showToast('🎉 Build gerado com sucesso!', 'success');
+                if (buildNameInput) buildNameInput.value = '';
 
-                if (downloadArea) downloadArea.classList.remove('hidden');
-                const downloadUrl = `${data.downloadUrl}?token=${API.token}`;
-                const dlBtn = document.getElementById('downloadBtn');
-                if (dlBtn) dlBtn.href = downloadUrl;
-
-                showToast('Build concluído com sucesso!', 'success');
                 this.loadBuildLimit();
-                Dashboard.loadUserDashboard();
+                Dashboard.loadRecentBuilds();
+                Dashboard.loadHistory();
+
+                if (result.downloadUrl) {
+                    window.location.href = result.downloadUrl;
+                }
             } catch (error) {
-                if (statusText) statusText.textContent = 'Erro: ' + error.message;
-                if (progressFill) progressFill.style.background = 'var(--danger)';
-                showToast(error.message, 'error');
+                Utils.showToast(error.message, 'error');
             } finally {
                 buildBtn.disabled = false;
             }

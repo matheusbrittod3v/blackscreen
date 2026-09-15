@@ -1,8 +1,11 @@
+/**
+ * App - Main Single Page Application Orchestrator & View Router
+ */
 const App = {
     async init() {
-        console.log('[App] init() started');
+        console.log('[App] Initializing secure frontend orchestrator...');
 
-        // Safe module initialization
+        // Initialize safe modules
         try { Auth.init(); } catch (e) { console.warn('[App] Auth init warning:', e); }
         try { Dashboard.init(); } catch (e) { console.warn('[App] Dashboard init warning:', e); }
         try { Build.init(); } catch (e) { console.warn('[App] Build init warning:', e); }
@@ -11,17 +14,17 @@ const App = {
         const hasToken = !!localStorage.getItem('token');
 
         if (hasToken) {
-            // Instantly show dashboard to prevent landing page flash on reload
+            // Instantly render dashboard if token exists to eliminate landing page reload flash
             this.showDashboard('user-dashboard');
 
             try {
                 const isAuthenticated = await Auth.checkAuth();
-                console.log('[App] isAuthenticated:', isAuthenticated);
+                console.log('[App] checkAuth result:', isAuthenticated);
                 if (!isAuthenticated) {
                     this.showLanding();
                 }
             } catch (error) {
-                console.error('[App] Check auth error:', error);
+                console.error('[App] Check auth exception:', error);
                 this.showLanding();
             }
         } else {
@@ -30,7 +33,6 @@ const App = {
     },
 
     showLanding() {
-        console.log('[App] showLanding()');
         const landing = document.getElementById('landing-view');
         const dashboard = document.getElementById('dashboard-view');
 
@@ -39,7 +41,8 @@ const App = {
             dashboard.className = 'view';
             dashboard.setAttribute('style', 'display:none !important');
         }
-        // Show landing
+
+        // Show landing page
         if (landing) {
             landing.className = 'view active';
             landing.setAttribute('style', 'display:block !important; position:relative; z-index:1; min-height:100vh');
@@ -48,7 +51,7 @@ const App = {
         document.body.classList.remove('is-admin');
         this.closeAuthModal();
 
-        // Update landing navbar action buttons according to auth state
+        // Update landing navbar CTA buttons dynamically based on session
         const actionsContainer = document.getElementById('landing-nav-auth-buttons');
         if (actionsContainer) {
             if (Auth.currentUser) {
@@ -88,34 +91,33 @@ const App = {
     },
 
     showDashboard(defaultPage = 'user-dashboard') {
-        console.log('[App] showDashboard() called with page:', defaultPage);
         const landing = document.getElementById('landing-view');
         const dashboard = document.getElementById('dashboard-view');
 
-        // Hide landing & close auth modal cleanly
+        // Hide landing page and close modal
         if (landing) {
             landing.className = 'view';
             landing.setAttribute('style', 'display:none !important');
         }
         this.closeAuthModal();
 
-        // Show dashboard container with !important inline to beat any CSS rule
+        // Show dashboard container
         if (dashboard) {
             dashboard.className = 'view active';
             dashboard.setAttribute('style', 'display:flex !important; position:relative; z-index:1; min-height:100vh');
         } else {
-            console.error('[App] dashboard-view element NOT FOUND!');
+            console.error('[App] CRITICAL: #dashboard-view element missing from DOM!');
             return;
         }
 
-        // Admin menu visibility
+        // Toggle admin menu visibility based on authenticated role
         if (Auth.currentUser?.role === 'admin') {
             document.body.classList.add('is-admin');
         } else {
             document.body.classList.remove('is-admin');
         }
 
-        // Synchronize User Info & navigate to active section
+        // Sync user state and navigate to requested page
         try { Dashboard.updateUserInfo(); } catch(e) { console.warn('[App] updateUserInfo error:', e); }
         try { Dashboard.navigateTo(defaultPage); } catch(e) { console.warn('[App] navigateTo error:', e); }
 
@@ -123,14 +125,17 @@ const App = {
     }
 };
 
-// Listen for Escape key to close modal
+// Global escape key listener to close modals safely
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         App.closeAuthModal();
+        if (typeof Admin !== 'undefined' && typeof Admin.closeModal === 'function') {
+            Admin.closeModal();
+        }
     }
 });
 
-// Start app reliably when DOM is ready
+// Start application when DOM tree is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => App.init());
 } else {

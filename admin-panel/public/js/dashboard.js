@@ -1,4 +1,6 @@
-// Dashboard Module
+/**
+ * Dashboard Module - Main User Panel Navigation & Real-time Metrics
+ */
 const Dashboard = {
     init() {
         this.setupNavigation();
@@ -8,7 +10,6 @@ const Dashboard = {
 
     setupNavigation() {
         const navItems = document.querySelectorAll('.nav-item');
-
         navItems.forEach(item => {
             item.addEventListener('click', () => {
                 const page = item.dataset.page;
@@ -20,17 +21,17 @@ const Dashboard = {
     navigateTo(pageId) {
         if (!pageId) pageId = 'user-dashboard';
 
-        // Update nav items
+        // Update nav items active state
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.toggle('active', item.dataset.page === pageId);
         });
 
-        // Update pages
+        // Update active page container
         document.querySelectorAll('.page').forEach(page => {
             page.classList.toggle('active', page.id === pageId);
         });
 
-        // Load page data
+        // Load section data dynamically
         switch (pageId) {
             case 'user-dashboard':
                 this.loadUserDashboard();
@@ -78,11 +79,11 @@ const Dashboard = {
         const roleEl = document.getElementById('user-role');
         const avatarEl = document.getElementById('user-avatar');
 
-        if (nameEl) nameEl.textContent = user.name;
+        if (nameEl) nameEl.textContent = user.name || 'Usuário';
         if (roleEl) roleEl.textContent = user.role === 'admin' ? 'Administrador' : 'Membro';
-        if (avatarEl) avatarEl.textContent = user.name.charAt(0).toUpperCase();
+        if (avatarEl) avatarEl.textContent = (user.name || 'U').charAt(0).toUpperCase();
 
-        // Show/hide admin menu
+        // Toggle admin-only UI elements
         if (user.role === 'admin') {
             document.body.classList.add('is-admin');
         } else {
@@ -99,18 +100,18 @@ const Dashboard = {
             const limitEl = document.getElementById('user-build-limit');
             const progressEl = document.getElementById('builds-progress');
 
-            if (usedEl) usedEl.textContent = data.used;
-            if (remEl) remEl.textContent = data.remaining;
-            if (limitEl) limitEl.textContent = data.limit;
+            if (usedEl) usedEl.textContent = data.used ?? 0;
+            if (remEl) remEl.textContent = data.remaining ?? 0;
+            if (limitEl) limitEl.textContent = data.limit ?? 5;
 
-            if (progressEl) {
-                const progressPercent = (data.used / data.limit) * 100;
+            if (progressEl && data.limit > 0) {
+                const progressPercent = Math.min(100, Math.max(0, (data.used / data.limit) * 100));
                 progressEl.style.width = `${progressPercent}%`;
             }
 
             await this.loadRecentBuilds();
         } catch (error) {
-            console.error('Error loading dashboard:', error);
+            console.error('[Dashboard] Error loading dashboard stats:', error);
         }
     },
 
@@ -118,24 +119,32 @@ const Dashboard = {
         try {
             const builds = await API.get('/api/build/history');
             const container = document.getElementById('user-recent-builds');
+            if (!container) return;
 
-            if (builds.length === 0) {
+            if (!Array.isArray(builds) || builds.length === 0) {
                 container.innerHTML = '<p class="empty-message">Nenhum build realizado ainda.</p>';
                 return;
             }
 
-            container.innerHTML = builds.slice(0, 5).map(build => `
-                <div class="build-item">
-                    <div class="build-status ${build.status}"></div>
-                    <div class="build-details">
-                        <span class="build-name">${build.buildName || `Build #${build.id}`}</span>
-                        <span class="build-date">${formatDate(build.createdAt)}</span>
+            container.innerHTML = builds.slice(0, 5).map(build => {
+                const safeName = Utils.escapeHtml(build.buildName || `Build #${build.id}`);
+                const safeStatus = Utils.escapeHtml(build.status || 'pending');
+                const safeDate = Utils.formatDate(build.createdAt);
+                const statusLabel = Utils.escapeHtml(this.getStatusLabel(build.status));
+
+                return `
+                    <div class="build-item">
+                        <div class="build-status ${safeStatus}"></div>
+                        <div class="build-details">
+                            <span class="build-name">${safeName}</span>
+                            <span class="build-date">${safeDate}</span>
+                        </div>
+                        <span class="status-badge ${safeStatus}">${statusLabel}</span>
                     </div>
-                    <span class="status-badge ${build.status}">${this.getStatusLabel(build.status)}</span>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         } catch (error) {
-            console.error('Error loading recent builds:', error);
+            console.error('[Dashboard] Error loading recent builds:', error);
         }
     },
 
@@ -143,30 +152,40 @@ const Dashboard = {
         try {
             const builds = await API.get('/api/build/history');
             const tbody = document.getElementById('history-table-body');
+            if (!tbody) return;
 
-            if (builds.length === 0) {
+            if (!Array.isArray(builds) || builds.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" class="empty-message">Nenhum build encontrado.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = builds.map(build => `
-                <tr>
-                    <td>#${build.id}</td>
-                    <td>${build.buildName || '-'}</td>
-                    <td><span class="status-badge ${build.status}">${this.getStatusLabel(build.status)}</span></td>
-                    <td>${formatFileSize(build.fileSize)}</td>
-                    <td>${build.downloadCount || 0}</td>
-                    <td>${formatDate(build.createdAt)}</td>
-                    <td>
-                        ${build.status === 'completed'
-                            ? `<a href="/api/build/download/${build.id}?token=${API.token}" class="btn-table-action" download>Baixar ZIP</a>`
-                            : `<span style="color:var(--text-muted);font-size:0.75rem;">-</span>`
-                        }
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = builds.map(build => {
+                const safeId = Utils.escapeHtml(build.id);
+                const safeName = Utils.escapeHtml(build.buildName || '-');
+                const safeStatus = Utils.escapeHtml(build.status || 'pending');
+                const safeSize = Utils.formatFileSize(build.fileSize);
+                const safeDownloads = Utils.escapeHtml(build.downloadCount || 0);
+                const safeDate = Utils.formatDate(build.createdAt);
+                const statusLabel = Utils.escapeHtml(this.getStatusLabel(build.status));
+
+                const actionHtml = build.status === 'completed'
+                    ? `<a href="/api/build/download/${safeId}?token=${encodeURIComponent(API.token)}" class="btn-table-action" download>Baixar ZIP</a>`
+                    : `<span style="color:var(--text-muted);font-size:0.75rem;">-</span>`;
+
+                return `
+                    <tr>
+                        <td>#${safeId}</td>
+                        <td>${safeName}</td>
+                        <td><span class="status-badge ${safeStatus}">${statusLabel}</span></td>
+                        <td>${safeSize}</td>
+                        <td>${safeDownloads}</td>
+                        <td>${safeDate}</td>
+                        <td>${actionHtml}</td>
+                    </tr>
+                `;
+            }).join('');
         } catch (error) {
-            console.error('Error loading history:', error);
+            console.error('[Dashboard] Error loading history:', error);
         }
     },
 

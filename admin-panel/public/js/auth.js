@@ -1,4 +1,6 @@
-// Auth Module
+/**
+ * Auth Module - Secure Authentication & Session Management
+ */
 const Auth = {
     currentUser: null,
 
@@ -14,13 +16,13 @@ const Auth = {
         if (params.get('verified') === '1') {
             App.showAuth('login');
             setTimeout(() => {
-                showToast('🎉 E-mail confirmado com sucesso! Você já pode entrar.', 'success');
+                Utils.showToast('🎉 E-mail confirmado com sucesso! Você já pode entrar.', 'success');
             }, 300);
             window.history.replaceState({}, document.title, window.location.pathname);
         } else if (params.get('verify_error')) {
             App.showAuth('login');
             setTimeout(() => {
-                showToast('⚠️ Link de confirmação inválido ou expirado. Solicite um novo abaixo.', 'error');
+                Utils.showToast('⚠️ Link de confirmação inválido ou expirado. Solicite um novo abaixo.', 'error');
             }, 300);
             window.history.replaceState({}, document.title, window.location.pathname);
         }
@@ -47,7 +49,6 @@ const Auth = {
             form.classList.toggle('active', form.id === `${target}-form`);
         });
 
-        // Hide resend box when switching tabs
         const resendBox = document.getElementById('resend-verification-box');
         if (resendBox) resendBox.style.display = 'none';
 
@@ -62,35 +63,25 @@ const Auth = {
         }
     },
 
-    fillDemo(type) {
-        this.switchTab('login');
-        const emailInput = document.getElementById('login-email');
-        const passwordInput = document.getElementById('login-password');
-        if (type === 'admin') {
-            emailInput.value = 'admin@blacktool.com';
-            passwordInput.value = 'admin123';
-        } else {
-            emailInput.value = 'user@blacktool.com';
-            passwordInput.value = 'user123';
-        }
-        showToast(`Credenciais de ${type === 'admin' ? 'Administrador' : 'Usuário'} preenchidas!`, 'info');
-    },
-
     setupForms() {
-        // Login Form
+        // Login Form Submit
         const loginForm = document.getElementById('login-form');
         if (loginForm) {
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = e.target.querySelector('button[type="submit"]');
-                if (btn) btn.classList.add('loading');
+                if (btn) btn.disabled = true;
 
                 const resendBox = document.getElementById('resend-verification-box');
                 if (resendBox) resendBox.style.display = 'none';
 
                 try {
-                    const email = document.getElementById('login-email')?.value || '';
+                    const email = (document.getElementById('login-email')?.value || '').trim();
                     const password = document.getElementById('login-password')?.value || '';
+
+                    if (!email || !password) {
+                        throw new Error('Preencha seu e-mail e senha.');
+                    }
 
                     const data = await API.post('/api/auth/login', { email, password });
 
@@ -100,37 +91,45 @@ const Auth = {
                     const passInput = document.getElementById('login-password');
                     if (passInput) passInput.value = '';
 
-                    showToast('Login realizado com sucesso!', 'success');
+                    Utils.showToast('Login realizado com sucesso!', 'success');
                     App.showDashboard('user-dashboard');
                 } catch (error) {
-                    showToast(error.message, 'error');
+                    Utils.showToast(error.message, 'error');
 
                     if (error.data?.emailNotVerified || error.message?.includes('confirme seu e-mail')) {
-                        const emailVal = document.getElementById('login-email')?.value || '';
+                        const emailVal = (document.getElementById('login-email')?.value || '').trim();
                         this.showResendOption(emailVal);
                     }
                 } finally {
-                    if (btn) btn.classList.remove('loading');
+                    if (btn) btn.disabled = false;
                 }
             });
         }
 
-        // Register Form
+        // Register Form Submit
         const registerForm = document.getElementById('register-form');
         if (registerForm) {
             registerForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = e.target.querySelector('button[type="submit"]');
-                if (btn) btn.classList.add('loading');
+                if (btn) btn.disabled = true;
 
                 try {
-                    const name = document.getElementById('register-name')?.value || '';
-                    const email = document.getElementById('register-email')?.value || '';
+                    const name = (document.getElementById('register-name')?.value || '').trim();
+                    const email = (document.getElementById('register-email')?.value || '').trim();
                     const password = document.getElementById('register-password')?.value || '';
                     const confirmPassword = document.getElementById('register-confirm')?.value || '';
 
+                    if (!name || !email || !password) {
+                        throw new Error('Preencha todos os campos obrigatórios.');
+                    }
+
+                    if (password.length < 6) {
+                        throw new Error('A senha deve conter no mínimo 6 caracteres.');
+                    }
+
                     if (password !== confirmPassword) {
-                        throw new Error('As senhas não conferem');
+                        throw new Error('As senhas digitadas não conferem.');
                     }
 
                     const data = await API.post('/api/auth/register', {
@@ -138,7 +137,7 @@ const Auth = {
                     });
 
                     if (data.requireVerification) {
-                        showToast(data.message, 'success');
+                        Utils.showToast(data.message, 'success');
                         this.switchTab('login');
                         const loginEmail = document.getElementById('login-email');
                         const loginPass = document.getElementById('login-password');
@@ -149,13 +148,13 @@ const Auth = {
                     } else if (data.token) {
                         API.setToken(data.token);
                         this.currentUser = data.user;
-                        showToast('Conta criada com sucesso!', 'success');
-                        App.showDashboard();
+                        Utils.showToast('Conta criada com sucesso!', 'success');
+                        App.showDashboard('user-dashboard');
                     }
                 } catch (error) {
-                    showToast(error.message, 'error');
+                    Utils.showToast(error.message, 'error');
                 } finally {
-                    if (btn) btn.classList.remove('loading');
+                    if (btn) btn.disabled = false;
                 }
             });
         }
@@ -164,12 +163,13 @@ const Auth = {
     showVerificationAlert(email) {
         const box = document.getElementById('resend-verification-box');
         if (box) {
+            const safeEmail = Utils.escapeHtml(email);
             box.innerHTML = `
                 <div style="background:rgba(108,92,231,0.15);border:1px solid rgba(108,92,231,0.35);border-radius:8px;padding:12px 14px;margin-top:14px;text-align:center;">
                     <p style="font-size:0.8rem;color:#cbd5e1;margin:0 0 8px;">
-                        📧 Enviamos um e-mail com link de confirmação para <strong>${email}</strong>.
+                        📧 Enviamos um e-mail com link de confirmação para <strong>${safeEmail}</strong>.
                     </p>
-                    <button type="button" class="btn-demo-quick" style="width:100%;padding:6px 10px;" onclick="Auth.resendVerification('${email}')">
+                    <button type="button" class="btn-demo-quick" style="width:100%;padding:6px 10px;" onclick="Auth.resendVerification('${safeEmail}')">
                         Reenviar E-mail de Confirmação
                     </button>
                 </div>
@@ -181,12 +181,13 @@ const Auth = {
     showResendOption(email) {
         const box = document.getElementById('resend-verification-box');
         if (box) {
+            const safeEmail = Utils.escapeHtml(email);
             box.innerHTML = `
                 <div style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px 14px;margin-top:14px;text-align:center;">
                     <p style="font-size:0.8rem;color:#fca5a5;margin:0 0 8px;">
                         ⚠️ Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada e spam.
                     </p>
-                    <button type="button" class="btn-demo-quick" style="width:100%;padding:6px 10px;" onclick="Auth.resendVerification('${email}')">
+                    <button type="button" class="btn-demo-quick" style="width:100%;padding:6px 10px;" onclick="Auth.resendVerification('${safeEmail}')">
                         Reenviar Link de Confirmação
                     </button>
                 </div>
@@ -197,17 +198,17 @@ const Auth = {
 
     async resendVerification(email) {
         if (!email) {
-            email = document.getElementById('login-email').value;
+            email = (document.getElementById('login-email')?.value || '').trim();
         }
         if (!email) {
-            return showToast('Por favor, informe seu e-mail no campo de login.', 'error');
+            return Utils.showToast('Por favor, informe seu e-mail no campo de login.', 'error');
         }
 
         try {
             const data = await API.post('/api/auth/resend-verification', { email });
-            showToast(data.message, 'success');
+            Utils.showToast(data.message, 'success');
         } catch (error) {
-            showToast(error.message, 'error');
+            Utils.showToast(error.message, 'error');
         }
     },
 
@@ -220,12 +221,12 @@ const Auth = {
 
                 if (input.type === 'password') {
                     input.type = 'text';
-                    eyeOpen.classList.add('hidden');
-                    eyeClosed.classList.remove('hidden');
+                    if (eyeOpen) eyeOpen.classList.add('hidden');
+                    if (eyeClosed) eyeClosed.classList.remove('hidden');
                 } else {
                     input.type = 'password';
-                    eyeOpen.classList.remove('hidden');
-                    eyeClosed.classList.add('hidden');
+                    if (eyeOpen) eyeOpen.classList.remove('hidden');
+                    if (eyeClosed) eyeClosed.classList.add('hidden');
                 }
             });
         });
@@ -236,10 +237,16 @@ const Auth = {
 
         try {
             const data = await API.get('/api/auth/me');
-            this.currentUser = data.user;
-            return true;
+            if (data && data.user) {
+                this.currentUser = data.user;
+                return true;
+            }
+            API.setToken(null);
+            this.currentUser = null;
+            return false;
         } catch (error) {
             API.setToken(null);
+            this.currentUser = null;
             return false;
         }
     },
@@ -249,6 +256,6 @@ const Auth = {
         this.currentUser = null;
         document.body.classList.remove('is-admin');
         App.showLanding();
-        showToast('Logout realizado com sucesso', 'info');
+        Utils.showToast('Logout realizado com sucesso', 'info');
     }
 };

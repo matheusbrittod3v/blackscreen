@@ -1,4 +1,6 @@
-// API Service
+/**
+ * Secure API Client Service
+ */
 const API = {
     baseUrl: '',
     token: localStorage.getItem('token'),
@@ -32,19 +34,28 @@ const API = {
                 }
             });
 
-            const data = await response.json();
+            let data = {};
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                data = { message: text };
+            }
 
             if (!response.ok) {
-                // If 401 Unauthorized occurs while token was present, auto-expire session
-                if (response.status === 401 && this.token) {
-                    this.setToken(null);
-                    if (typeof Auth !== 'undefined') Auth.currentUser = null;
-                    if (typeof App !== 'undefined' && typeof App.showLanding === 'function') {
-                        App.showLanding();
-                        showToast('Sessão expirada. Por favor, faça login novamente.', 'warning');
+                // Security Interceptor: handle 401 Unauthorized or 403 Account Deactivated
+                if ((response.status === 401 || response.status === 403) && this.token) {
+                    if (data.error !== 'Conta desativada' && !endpoint.includes('/login')) {
+                        this.setToken(null);
+                        if (typeof Auth !== 'undefined') Auth.currentUser = null;
+                        if (typeof App !== 'undefined' && typeof App.showLanding === 'function') {
+                            App.showLanding();
+                            Utils.showToast('Sessão expirada. Por favor, faça login novamente.', 'warning');
+                        }
                     }
                 }
-                const err = new Error(data.error || 'Erro na requisição');
+                const err = new Error(data.error || data.message || 'Erro na requisição');
                 err.data = data;
                 err.status = response.status;
                 throw err;
@@ -90,52 +101,15 @@ const API = {
             body: formData
         });
 
-        return response.json();
+        const data = await response.json();
+
+        if (!response.ok) {
+            const err = new Error(data.error || 'Erro no envio do arquivo');
+            err.data = data;
+            err.status = response.status;
+            throw err;
+        }
+
+        return data;
     }
 };
-
-// Toast notifications
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.className = `toast ${type} show`;
-
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-}
-
-// Format date
-function formatDate(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
-
-// Format file size
-function formatFileSize(bytes) {
-    if (!bytes || bytes === 0) return '-';
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
-}
-
-// Relative time
-function relativeTime(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diff = Math.floor((now - date) / 1000);
-
-    if (diff < 60) return 'agora';
-    if (diff < 3600) return `${Math.floor(diff / 60)}m atrás`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h atrás`;
-    if (diff < 604800) return `${Math.floor(diff / 86400)}d atrás`;
-    return formatDate(dateString);
-}
