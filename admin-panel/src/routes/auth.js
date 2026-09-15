@@ -17,18 +17,12 @@ router.post('/login', async (req, res) => {
 
         const user = await userRepository.findByEmail(email);
 
-        if (!user) {
-            return res.status(401).json({ error: 'Credenciais inválidas' });
+        if (!user || !(await userRepository.validatePassword(user, password))) {
+            return res.status(400).json({ error: 'E-mail ou senha incorretos. Verifique suas credenciais.' });
         }
 
         if (!user.isActive) {
             return res.status(403).json({ error: 'Conta desativada. Contate o administrador.' });
-        }
-
-        const validPassword = await userRepository.validatePassword(user, password);
-
-        if (!validPassword) {
-            return res.status(401).json({ error: 'Credenciais inválidas' });
         }
 
         // Email verification check (bypass for admin accounts)
@@ -98,18 +92,14 @@ router.post('/register', async (req, res) => {
             verificationTokenExpires: tokenExpires
         });
 
-        // Send confirmation email via Resend
-        let emailSent = false;
-        try {
-            await emailService.sendVerificationEmail({
-                to: email,
-                name: name,
-                verificationToken: verificationToken
-            });
-            emailSent = true;
-        } catch (emailErr) {
+        // Trigger email send asynchronously so client receives instant 201 response
+        emailService.sendVerificationEmail({
+            to: email,
+            name: name,
+            verificationToken: verificationToken
+        }).catch(emailErr => {
             console.error('Falha ao enviar e-mail de confirmação no cadastro:', emailErr.message);
-        }
+        });
 
         await activityLogRepository.create({
             userId: user.id,
@@ -119,9 +109,7 @@ router.post('/register', async (req, res) => {
         });
 
         res.status(201).json({
-            message: emailSent
-                ? `Conta criada com sucesso! Enviamos um link de confirmação para ${email}. Por favor, verifique sua caixa de entrada e spam.`
-                : `Conta criada com sucesso! Houve uma oscilação temporária no envio do e-mail para ${email}. Você pode solicitar o reenvio a qualquer momento.`,
+            message: `Conta criada com sucesso! Enviamos um link de confirmação para ${email}. Por favor, verifique sua caixa de entrada e spam.`,
             requireVerification: true,
             email: user.email
         });
