@@ -2,7 +2,7 @@
  * BlackScreenTool - SPA Orchestrator Controller
  * Dynamically mounts component templates on-demand into #app and #modal-root
  */
-class App {
+class AppController {
     constructor() {
         this.currentView = null;
     }
@@ -98,13 +98,13 @@ class App {
     }
 }
 
-// Global App instance
-const windowApp = new App();
-window.App = windowApp;
+// Global App instance exposed for inline DOM event handlers (onclick="App.showAuth(...)")
+const App = new AppController();
+window.App = App;
 
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        windowApp.closeAuthModal();
+        App.closeAuthModal();
         if (typeof Admin !== 'undefined' && typeof Admin.closeModal === 'function') {
             Admin.closeModal();
         }
@@ -112,7 +112,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => windowApp.init());
+    document.addEventListener('DOMContentLoaded', () => App.init());
 } else {
-    windowApp.init();
+    App.init();
 }
