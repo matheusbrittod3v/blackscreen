@@ -65,7 +65,13 @@ class BuildWorker {
                 status: 'building'
             });
 
-            // 2. Prepare user's util folder and sync into build environment
+            // 2. Write user's exact settings.json into userUtil and sync build environment
+            const userSettingsJson = {
+                CorrectPassword: job.passwordToUse || '',
+                CustomMessage: job.messageToUse || ''
+            };
+            await fs.writeJson(path.join(job.userUtil, 'settings.json'), userSettingsJson, { spaces: 2 });
+
             const defaults = ['logo.png', 'logo.ico'];
             for (const defaultFile of defaults) {
                 const userFile = path.join(job.userUtil, defaultFile);

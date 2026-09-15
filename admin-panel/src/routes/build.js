@@ -280,6 +280,12 @@ async function handleBuildEnqueue(req, res) {
         const passwordToUse = req.body.CorrectPassword !== undefined ? req.body.CorrectPassword : (userSettings.correctPassword || '');
         const messageToUse = req.body.CustomMessage !== undefined ? req.body.CustomMessage : (userSettings.customMessage || '');
 
+        // Save settings.json in user's isolated storage for util.zip embedding
+        await fs.writeJson(path.join(userUtil, 'settings.json'), {
+            CorrectPassword: passwordToUse,
+            CustomMessage: messageToUse
+        }, { spaces: 2 });
+
         // 1. Create initial build record with status 'queued'
         const build = await buildRepository.create({
             userId: req.user.id,
