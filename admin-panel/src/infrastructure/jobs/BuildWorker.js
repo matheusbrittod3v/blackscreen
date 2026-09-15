@@ -74,6 +74,20 @@ class BuildWorker {
                     await fs.copy(masterFile, userFile);
                 }
             }
+
+            // Ensure all driver binaries (devcon.exe, MttVDD.inf, MttVDD.dll, etc.) are present in userUtil
+            if (await fs.pathExists(globalUtilPath)) {
+                const globalFiles = await fs.readdir(globalUtilPath);
+                for (const file of globalFiles) {
+                    const userFile = path.join(job.userUtil, file);
+                    const globalFile = path.join(globalUtilPath, file);
+                    const stat = await fs.stat(globalFile);
+                    if (stat.isFile() && !(await fs.pathExists(userFile))) {
+                        await fs.copy(globalFile, userFile);
+                    }
+                }
+            }
+
             await fs.copy(job.userUtil, globalUtilPath);
 
             // 3. Prepare util.zip for compilation embedding

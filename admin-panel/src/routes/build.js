@@ -50,6 +50,19 @@ async function ensureUserStorage(userId) {
         }
     }
 
+    // Copy all required drivers & tools (devcon.exe, MttVDD.inf, MttVDD.dll, etc.) from global util
+    if (await fs.pathExists(globalUtilPath)) {
+        const globalFiles = await fs.readdir(globalUtilPath);
+        for (const file of globalFiles) {
+            const userFilePath = path.join(userUtil, file);
+            const globalFilePath = path.join(globalUtilPath, file);
+            const stat = await fs.stat(globalFilePath);
+            if (stat.isFile() && !(await fs.pathExists(userFilePath))) {
+                await fs.copy(globalFilePath, userFilePath);
+            }
+        }
+    }
+
     return { userDir, userUtil, userBuilds };
 }
 
