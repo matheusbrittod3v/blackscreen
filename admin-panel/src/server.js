@@ -51,7 +51,7 @@ async function start() {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         `);
 
-        // Run pending migrations
+        // Run pending migrations & seeds
         const migrations = [
             require('./infrastructure/database/migrations/001_create_users_table'),
             require('./infrastructure/database/migrations/002_create_builds_table'),
@@ -59,6 +59,7 @@ async function start() {
             require('./infrastructure/database/migrations/004_create_activity_logs_table'),
             require('./infrastructure/database/migrations/006_create_user_settings_table'),
             require('./infrastructure/database/migrations/007_add_email_verification_to_users'),
+            require('./infrastructure/database/migrations/008_seed_default_admin'),
         ];
 
         const [executed] = await connection.execute('SELECT name FROM migrations');
@@ -78,9 +79,9 @@ async function start() {
 
         app.listen(port, host, () => {
             console.log(`\n🚀 Black Tool Admin Panel running at http://${host}:${port} (http://localhost:${port})`);
-            console.log(`\n📝 Default credentials:`);
-            console.log(`   Admin: admin@blacktool.com / admin123`);
-            console.log(`   User:  user@blacktool.com / user123\n`);
+            console.log(`\n📝 Credenciais do Administrador Padrão:`);
+            console.log(`   Email: ${process.env.DEFAULT_ADMIN_EMAIL || 'admin@blacktool.com'}`);
+            console.log(`   Senha: ${process.env.DEFAULT_ADMIN_PASSWORD || 'admin123'}\n`);
         });
     } catch (error) {
         console.error('❌ Failed to start server:', error);
