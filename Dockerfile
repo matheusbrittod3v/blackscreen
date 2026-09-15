@@ -15,6 +15,7 @@ WORKDIR /app/admin-panel
 RUN npm install
 
 # Expõe a porta do painel
+EXPOSE 80
 EXPOSE 3000
 
 # Comando para rodar o painel

@@ -4,7 +4,8 @@ const path = require('path');
 const { runMigrations } = require('./infrastructure/database/migrations/runner');
 
 const app = express();
-const port = process.env.PORT || 80;
+const host = process.env.HOST || '0.0.0.0';
+const port = parseInt(process.env.PORT, 10) || 80;
 
 // Middleware
 app.use(cors());
@@ -73,8 +74,8 @@ async function start() {
         connection.release();
         console.log('✅ Database connected and migrated');
 
-        app.listen(port, () => {
-            console.log(`\n🚀 Black Tool Admin Panel running at http://localhost:${port}`);
+        app.listen(port, host, () => {
+            console.log(`\n🚀 Black Tool Admin Panel running at http://${host}:${port} (http://localhost:${port})`);
             console.log(`\n📝 Default credentials:`);
             console.log(`   Admin: admin@blacktool.com / admin123`);
             console.log(`   User:  user@blacktool.com / user123\n`);
