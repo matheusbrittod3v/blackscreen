@@ -1,18 +1,21 @@
-// Main App
 const App = {
     async init() {
-        // Initialize modules
-        Auth.init();
-        Dashboard.init();
-        Build.init();
-        Admin.init();
+        // Safe module initialization
+        try { Auth.init(); } catch (e) { console.warn('Auth init warning:', e); }
+        try { Dashboard.init(); } catch (e) { console.warn('Dashboard init warning:', e); }
+        try { Build.init(); } catch (e) { console.warn('Build init warning:', e); }
+        try { Admin.init(); } catch (e) { console.warn('Admin init warning:', e); }
 
-        // Check auth state
-        const isAuthenticated = await Auth.checkAuth();
-
-        if (isAuthenticated) {
-            this.showDashboard();
-        } else {
+        // Check auth state and show appropriate view
+        try {
+            const isAuthenticated = await Auth.checkAuth();
+            if (isAuthenticated) {
+                this.showDashboard();
+            } else {
+                this.showLanding();
+            }
+        } catch (error) {
+            console.error('Check auth error:', error);
             this.showLanding();
         }
     },
@@ -51,7 +54,9 @@ const App = {
             document.body.style.overflow = 'hidden';
         }
 
-        Auth.switchTab(tab);
+        if (typeof Auth.switchTab === 'function') {
+            Auth.switchTab(tab);
+        }
     },
 
     closeAuthModal() {
@@ -72,13 +77,11 @@ const App = {
 
         this.closeAuthModal();
 
-        // Update user info
-        Dashboard.updateUserInfo();
-
-        // Load initial data
-        Dashboard.loadUserDashboard();
-        Build.loadSettings();
-        Build.loadBuildLimit();
+        // Update user info & load dashboard
+        try { Dashboard.updateUserInfo(); } catch(e){}
+        try { Dashboard.loadUserDashboard(); } catch(e){}
+        try { Build.loadSettings(); } catch(e){}
+        try { Build.loadBuildLimit(); } catch(e){}
 
         // If admin, show admin menu
         if (Auth.currentUser?.role === 'admin') {
@@ -98,7 +101,9 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Start app when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+// Start app reliably when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => App.init());
+} else {
     App.init();
-});
+}

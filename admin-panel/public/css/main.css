@@ -479,6 +479,10 @@ select {
     display: block !important;
 }
 
+#dashboard-view.active {
+    display: flex !important;
+}
+
 #landing-view:not(.active),
 #auth-view:not(.active),
 #dashboard-view:not(.active) {

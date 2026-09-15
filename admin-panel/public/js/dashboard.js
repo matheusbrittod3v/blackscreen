@@ -43,24 +43,34 @@ const Dashboard = {
     },
 
     setupLogout() {
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            Auth.logout();
-        });
+        const btn = document.getElementById('logout-btn');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                Auth.logout();
+            });
+        }
     },
 
     setupGoToBuild() {
-        document.getElementById('go-to-build').addEventListener('click', () => {
-            this.navigateTo('build-page');
-        });
+        const btn = document.getElementById('go-to-build');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                this.navigateTo('build-page');
+            });
+        }
     },
 
     updateUserInfo() {
         const user = Auth.currentUser;
         if (!user) return;
 
-        document.getElementById('user-name').textContent = user.name;
-        document.getElementById('user-role').textContent = user.role === 'admin' ? 'Administrador' : 'Membro';
-        document.getElementById('user-avatar').textContent = user.name.charAt(0).toUpperCase();
+        const nameEl = document.getElementById('user-name');
+        const roleEl = document.getElementById('user-role');
+        const avatarEl = document.getElementById('user-avatar');
+
+        if (nameEl) nameEl.textContent = user.name;
+        if (roleEl) roleEl.textContent = user.role === 'admin' ? 'Administrador' : 'Membro';
+        if (avatarEl) avatarEl.textContent = user.name.charAt(0).toUpperCase();
 
         // Show/hide admin menu
         if (user.role === 'admin') {
@@ -74,12 +84,19 @@ const Dashboard = {
         try {
             const data = await API.get('/api/build/build-limit');
 
-            document.getElementById('user-builds-used').textContent = data.used;
-            document.getElementById('user-builds-remaining').textContent = data.remaining;
-            document.getElementById('user-build-limit').textContent = data.limit;
+            const usedEl = document.getElementById('user-builds-used');
+            const remEl = document.getElementById('user-builds-remaining');
+            const limitEl = document.getElementById('user-build-limit');
+            const progressEl = document.getElementById('builds-progress');
 
-            const progressPercent = (data.used / data.limit) * 100;
-            document.getElementById('builds-progress').style.width = `${progressPercent}%`;
+            if (usedEl) usedEl.textContent = data.used;
+            if (remEl) remEl.textContent = data.remaining;
+            if (limitEl) limitEl.textContent = data.limit;
+
+            if (progressEl) {
+                const progressPercent = (data.used / data.limit) * 100;
+                progressEl.style.width = `${progressPercent}%`;
+            }
 
             await this.loadRecentBuilds();
         } catch (error) {

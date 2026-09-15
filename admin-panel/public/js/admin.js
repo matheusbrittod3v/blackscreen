@@ -39,58 +39,75 @@ const Admin = {
 
     setupModal() {
         const modal = document.getElementById('user-modal');
+        if (!modal) return;
         const addBtn = document.getElementById('add-user-btn');
         const closeBtn = modal.querySelector('.modal-close');
         const cancelBtn = modal.querySelector('.modal-cancel');
         const overlay = modal.querySelector('.modal-overlay');
 
-        addBtn.addEventListener('click', () => {
-            this.openModal();
-        });
+        if (addBtn) {
+            addBtn.addEventListener('click', () => {
+                this.openModal();
+            });
+        }
 
         [closeBtn, cancelBtn, overlay].forEach(el => {
-            el.addEventListener('click', () => {
-                this.closeModal();
-            });
+            if (el) {
+                el.addEventListener('click', () => {
+                    this.closeModal();
+                });
+            }
         });
     },
 
     openModal(user = null) {
         const modal = document.getElementById('user-modal');
+        if (!modal) return;
         const title = document.getElementById('modal-title');
         const form = document.getElementById('user-form');
 
-        form.reset();
-        document.getElementById('edit-user-id').value = '';
+        if (form) form.reset();
+        const editId = document.getElementById('edit-user-id');
+        if (editId) editId.value = '';
 
         if (user) {
-            title.textContent = 'Editar Cliente';
-            document.getElementById('edit-user-id').value = user.id;
-            document.getElementById('modal-user-name').value = user.name;
-            document.getElementById('modal-user-email').value = user.email;
-            document.getElementById('modal-user-password').value = ''; // Always clear password on edit
-            document.getElementById('modal-user-role').value = user.role;
-            document.getElementById('modal-user-limit').value = user.monthlyBuildLimit;
-            document.getElementById('modal-user-active').value = user.isActive.toString();
+            if (title) title.textContent = 'Editar Cliente';
+            if (editId) editId.value = user.id;
+            const nameEl = document.getElementById('modal-user-name');
+            const emailEl = document.getElementById('modal-user-email');
+            const passEl = document.getElementById('modal-user-password');
+            const roleEl = document.getElementById('modal-user-role');
+            const limitEl = document.getElementById('modal-user-limit');
+            const activeEl = document.getElementById('modal-user-active');
+
+            if (nameEl) nameEl.value = user.name;
+            if (emailEl) emailEl.value = user.email;
+            if (passEl) passEl.value = '';
+            if (roleEl) roleEl.value = user.role;
+            if (limitEl) limitEl.value = user.monthlyBuildLimit;
+            if (activeEl) activeEl.value = user.isActive.toString();
         } else {
-            title.textContent = 'Novo Cliente';
-            document.getElementById('modal-user-password').value = '';
+            if (title) title.textContent = 'Novo Cliente';
+            const passEl = document.getElementById('modal-user-password');
+            if (passEl) passEl.value = '';
         }
 
         modal.classList.add('active');
     },
 
     closeModal() {
-        document.getElementById('user-modal').classList.remove('active');
+        const modal = document.getElementById('user-modal');
+        if (modal) modal.classList.remove('active');
     },
 
     setupUserForm() {
         const form = document.getElementById('user-form');
+        if (!form) return;
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = form.querySelector('button[type="submit"]');
-            btn.classList.add('loading');
+            if (btn) btn.classList.add('loading');
 
             try {
                 const id = document.getElementById('edit-user-id').value;

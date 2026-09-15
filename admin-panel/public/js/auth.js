@@ -78,75 +78,84 @@ const Auth = {
 
     setupForms() {
         // Login Form
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.classList.add('loading');
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
+                if (btn) btn.classList.add('loading');
 
-            const resendBox = document.getElementById('resend-verification-box');
-            if (resendBox) resendBox.style.display = 'none';
+                const resendBox = document.getElementById('resend-verification-box');
+                if (resendBox) resendBox.style.display = 'none';
 
-            try {
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
+                try {
+                    const email = document.getElementById('login-email')?.value || '';
+                    const password = document.getElementById('login-password')?.value || '';
 
-                const data = await API.post('/api/auth/login', { email, password });
+                    const data = await API.post('/api/auth/login', { email, password });
 
-                API.setToken(data.token);
-                this.currentUser = data.user;
-
-                showToast('Login realizado com sucesso!', 'success');
-                App.showDashboard();
-            } catch (error) {
-                showToast(error.message, 'error');
-
-                if (error.data?.emailNotVerified || error.message?.includes('confirme seu e-mail')) {
-                    this.showResendOption(document.getElementById('login-email').value);
-                }
-            } finally {
-                btn.classList.remove('loading');
-            }
-        });
-
-        // Register Form
-        document.getElementById('register-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.classList.add('loading');
-
-            try {
-                const name = document.getElementById('register-name').value;
-                const email = document.getElementById('register-email').value;
-                const password = document.getElementById('register-password').value;
-                const confirmPassword = document.getElementById('register-confirm').value;
-
-                if (password !== confirmPassword) {
-                    throw new Error('As senhas não conferem');
-                }
-
-                const data = await API.post('/api/auth/register', {
-                    name, email, password, confirmPassword
-                });
-
-                if (data.requireVerification) {
-                    showToast(data.message, 'success');
-                    this.switchTab('login');
-                    document.getElementById('login-email').value = email;
-                    document.getElementById('login-password').value = '';
-                    document.getElementById('register-form').reset();
-                    this.showVerificationAlert(email);
-                } else if (data.token) {
                     API.setToken(data.token);
                     this.currentUser = data.user;
-                    showToast('Conta criada com sucesso!', 'success');
+
+                    showToast('Login realizado com sucesso!', 'success');
                     App.showDashboard();
+                } catch (error) {
+                    showToast(error.message, 'error');
+
+                    if (error.data?.emailNotVerified || error.message?.includes('confirme seu e-mail')) {
+                        const emailVal = document.getElementById('login-email')?.value || '';
+                        this.showResendOption(emailVal);
+                    }
+                } finally {
+                    if (btn) btn.classList.remove('loading');
                 }
-            } catch (error) {
-                showToast(error.message, 'error');
-            } finally {
-                btn.classList.remove('loading');
-            }
-        });
+            });
+        }
+
+        // Register Form
+        const registerForm = document.getElementById('register-form');
+        if (registerForm) {
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
+                if (btn) btn.classList.add('loading');
+
+                try {
+                    const name = document.getElementById('register-name')?.value || '';
+                    const email = document.getElementById('register-email')?.value || '';
+                    const password = document.getElementById('register-password')?.value || '';
+                    const confirmPassword = document.getElementById('register-confirm')?.value || '';
+
+                    if (password !== confirmPassword) {
+                        throw new Error('As senhas não conferem');
+                    }
+
+                    const data = await API.post('/api/auth/register', {
+                        name, email, password, confirmPassword
+                    });
+
+                    if (data.requireVerification) {
+                        showToast(data.message, 'success');
+                        this.switchTab('login');
+                        const loginEmail = document.getElementById('login-email');
+                        const loginPass = document.getElementById('login-password');
+                        if (loginEmail) loginEmail.value = email;
+                        if (loginPass) loginPass.value = '';
+                        registerForm.reset();
+                        this.showVerificationAlert(email);
+                    } else if (data.token) {
+                        API.setToken(data.token);
+                        this.currentUser = data.user;
+                        showToast('Conta criada com sucesso!', 'success');
+                        App.showDashboard();
+                    }
+                } catch (error) {
+                    showToast(error.message, 'error');
+                } finally {
+                    if (btn) btn.classList.remove('loading');
+                }
+            });
+        }
     },
 
     showVerificationAlert(email) {
