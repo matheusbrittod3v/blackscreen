@@ -10,7 +10,7 @@
     width: 100vw !important;
     height: 100vh !important;
     z-index: 10000 !important;
-    display: none;
+    display: none !important;
     align-items: center;
     justify-content: center;
     padding: var(--space-md);

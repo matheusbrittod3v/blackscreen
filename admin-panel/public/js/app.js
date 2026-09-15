@@ -8,17 +8,23 @@ const App = {
         try { Build.init(); } catch (e) { console.warn('[App] Build init warning:', e); }
         try { Admin.init(); } catch (e) { console.warn('[App] Admin init warning:', e); }
 
-        // Check auth state and show appropriate view
-        try {
-            const isAuthenticated = await Auth.checkAuth();
-            console.log('[App] isAuthenticated:', isAuthenticated);
-            if (isAuthenticated) {
-                this.showDashboard('user-dashboard');
-            } else {
+        const hasToken = !!localStorage.getItem('token');
+
+        if (hasToken) {
+            // Instantly show dashboard to prevent landing page flash on reload
+            this.showDashboard('user-dashboard');
+
+            try {
+                const isAuthenticated = await Auth.checkAuth();
+                console.log('[App] isAuthenticated:', isAuthenticated);
+                if (!isAuthenticated) {
+                    this.showLanding();
+                }
+            } catch (error) {
+                console.error('[App] Check auth error:', error);
                 this.showLanding();
             }
-        } catch (error) {
-            console.error('[App] Check auth error:', error);
+        } else {
             this.showLanding();
         }
     },
@@ -62,8 +68,8 @@ const App = {
     showAuth(tab = 'login') {
         const modal = document.getElementById('auth-modal');
         if (modal) {
-            modal.style.display = 'flex';
             modal.classList.add('active');
+            modal.setAttribute('style', 'display:flex !important');
             document.body.style.overflow = 'hidden';
         }
 
@@ -76,7 +82,7 @@ const App = {
         const modal = document.getElementById('auth-modal');
         if (modal) {
             modal.classList.remove('active');
-            modal.style.display = 'none';
+            modal.setAttribute('style', 'display:none !important');
         }
         document.body.style.overflow = '';
     },
@@ -86,11 +92,13 @@ const App = {
         const landing = document.getElementById('landing-view');
         const dashboard = document.getElementById('dashboard-view');
 
-        // Hide landing
+        // Hide landing & close auth modal cleanly
         if (landing) {
             landing.className = 'view';
             landing.setAttribute('style', 'display:none !important');
         }
+        this.closeAuthModal();
+
         // Show dashboard container with !important inline to beat any CSS rule
         if (dashboard) {
             dashboard.className = 'view active';
@@ -99,8 +107,6 @@ const App = {
             console.error('[App] dashboard-view element NOT FOUND!');
             return;
         }
-
-        this.closeAuthModal();
 
         // Admin menu visibility
         if (Auth.currentUser?.role === 'admin') {
