@@ -62,27 +62,25 @@ class EmailService {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirme seu e-mail - BlackScreen Tool</title>
 </head>
-<body style="margin:0;padding:0;background-color:#0b0d19;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#f0f2f5;">
-    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#0b0d19;padding:40px 15px;">
+<body style="margin:0;padding:0;background-color:#07070a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#f8fafc;">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#07070a;padding:40px 15px;">
         <tr>
             <td align="center">
-                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:560px;background:linear-gradient(145deg, #131528, #181b33);border:1px solid rgba(255,255,255,0.08);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,0.6);overflow:hidden;">
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width:560px;background:linear-gradient(145deg, #121320, #0a0a0f);border:1px solid rgba(225,29,72,0.25);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,0.8);overflow:hidden;">
                     
                     <!-- Header com Logo -->
                     <tr>
-                        <td align="center" style="padding:36px 30px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+                        <td align="center" style="padding:32px 30px 20px;border-bottom:1px solid rgba(225,29,72,0.15);">
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td style="vertical-align:middle;padding-right:12px;">
-                                        <div style="width:42px;height:42px;background:linear-gradient(135deg,#6c5ce7,#fd79a8);border-radius:10px;text-align:center;line-height:42px;box-shadow:0 4px 15px rgba(108,92,231,0.5);">
-                                            <span style="font-size:22px;color:#ffffff;">&#9670;</span>
-                                        </div>
+                                    <td style="vertical-align:middle;padding-right:14px;">
+                                        <img src="https://blackscreentool.com.br/img/logo.png" alt="BlackScreen Tool Logo" width="56" height="56" style="display:block;border:0;outline:none;text-decoration:none;">
                                     </td>
                                     <td style="vertical-align:middle;">
                                         <h1 style="margin:0;font-size:24px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">
-                                            Black<span style="background:linear-gradient(135deg,#6c5ce7,#fd79a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Tool</span>
+                                            BlackScreen<span style="color:#e11d48;">Tool</span>
                                         </h1>
-                                        <span style="font-size:11px;color:#8f9bb3;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Cloud Engine v2.0</span>
+                                        <span style="font-size:11px;color:#f87171;letter-spacing:1px;text-transform:uppercase;font-weight:600;">Ferramenta para Unlockers</span>
                                     </td>
                                 </tr>
                             </table>
@@ -106,7 +104,7 @@ class EmailService {
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin:28px 0;">
                                 <tr>
                                     <td align="center">
-                                        <a href="${verifyUrl}" target="_blank" style="display:inline-block;padding:15px 36px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;background:linear-gradient(135deg,#6c5ce7,#fd79a8);border-radius:10px;box-shadow:0 6px 25px rgba(108,92,231,0.4);letter-spacing:0.3px;">
+                                        <a href="${verifyUrl}" target="_blank" style="display:inline-block;padding:15px 36px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;background:linear-gradient(135deg,#e11d48,#be123c);border-radius:10px;box-shadow:0 6px 25px rgba(225,29,72,0.5);letter-spacing:0.3px;">
                                             &#10004; CONFIRMAR MEU E-MAIL
                                         </a>
                                     </td>
