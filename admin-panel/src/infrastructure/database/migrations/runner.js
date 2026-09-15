@@ -8,6 +8,8 @@ const migrations = [
     require('./002_create_builds_table'),
     require('./003_create_sessions_table'),
     require('./004_create_activity_logs_table'),
+    require('./006_create_user_settings_table'),
+    require('./007_add_email_verification_to_users'),
 ];
 
 async function ensureMigrationsTable(connection) {

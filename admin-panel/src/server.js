@@ -57,6 +57,8 @@ async function start() {
             require('./infrastructure/database/migrations/002_create_builds_table'),
             require('./infrastructure/database/migrations/003_create_sessions_table'),
             require('./infrastructure/database/migrations/004_create_activity_logs_table'),
+            require('./infrastructure/database/migrations/006_create_user_settings_table'),
+            require('./infrastructure/database/migrations/007_add_email_verification_to_users'),
         ];
 
         const [executed] = await connection.execute('SELECT name FROM migrations');

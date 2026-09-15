@@ -35,7 +35,9 @@ const API = {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'Erro na requisição');
+                const err = new Error(data.error || 'Erro na requisição');
+                err.data = data;
+                throw err;
             }
 
             return data;

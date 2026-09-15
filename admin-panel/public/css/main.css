@@ -443,6 +443,28 @@ select {
     box-shadow: 0 10px 40px rgba(239, 68, 68, 0.2);
 }
 
+.btn-table-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0.35rem 0.8rem;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    box-shadow: 0 2px 8px var(--primary-glow);
+    transition: all var(--transition-fast);
+}
+
+.btn-table-action:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px var(--primary-glow);
+    color: #fff;
+}
+
 /* ============================================
    VIEWS
    ============================================ */

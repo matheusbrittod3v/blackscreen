@@ -7,6 +7,7 @@
     <title>BlackTool - Painel de Controle</title>
     <meta name="description" content="BlackTool - Sistema de build automatizado com painel administrativo">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/landing.css">
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/admin.css">
@@ -25,128 +26,503 @@
 
     <!-- App Container -->
     <div id="app">
-        <!-- Auth View (Login/Register) -->
-        <div id="auth-view" class="view active">
-            <div class="auth-container">
-                <div class="auth-card glass-card">
-                    <div class="auth-header">
-                        <div class="logo">
-                            <div class="logo-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                                    <path d="M2 17l10 5 10-5"></path>
-                                    <path d="M2 12l10 5 10-5"></path>
-                                </svg>
-                            </div>
-                            <h1>Black<span class="gradient-text">Tool</span></h1>
+        <!-- Landing Page View -->
+        <div id="landing-view" class="view active">
+            <div class="landing-container">
+                <!-- Navigation -->
+                <nav class="landing-nav">
+                    <div class="landing-brand" onclick="App.showLanding()">
+                        <div class="logo-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                <path d="M2 17l10 5 10-5"></path>
+                                <path d="M2 12l10 5 10-5"></path>
+                            </svg>
                         </div>
-                        <p class="auth-subtitle">Sistema de Build Automatizado</p>
+                        <span>Black<span class="gradient-text">Tool</span></span>
                     </div>
 
-                    <!-- Tab Navigation -->
-                    <div class="auth-tabs">
-                        <button class="tab-btn active" data-tab="login">Entrar</button>
-                        <button class="tab-btn" data-tab="register">Criar Conta</button>
-                        <div class="tab-indicator"></div>
+                    <ul class="landing-links">
+                        <li><a href="#features">Recursos</a></li>
+                        <li><a href="#how-it-works">Como Funciona</a></li>
+                        <li><a href="#status-section">Operação</a></li>
+                    </ul>
+
+                    <div class="landing-nav-actions" id="landing-nav-auth-buttons">
+                        <button class="btn-nav-ghost" onclick="App.showAuth('login')">Entrar</button>
+                        <button class="btn-nav-cta" onclick="App.showAuth('register')">Criar Conta</button>
+                    </div>
+                </nav>
+
+                <!-- Hero Section -->
+                <section class="landing-hero">
+                    <div class="hero-pill">
+                        <span class="dot"></span>
+                        <span>v2.0 Multi-Tenant Pro • Ambiente 100% Isolado por Usuário</span>
                     </div>
 
-                    <!-- Login Form -->
-                    <form id="login-form" class="auth-form active">
-                        <div class="form-group">
-                            <label for="login-email">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path
-                                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
-                                    </path>
-                                    <polyline points="22,6 12,13 2,6"></polyline>
-                                </svg>
-                                Email
-                            </label>
-                            <input type="email" id="login-email" placeholder="seu@email.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="login-password">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                </svg>
-                                Senha
-                            </label>
-                            <div class="password-input">
-                                <input type="password" id="login-password" placeholder="••••••••" required
-                                    autocomplete="current-password">
-                                <button type="button" class="toggle-password">
-                                    <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                    <svg class="eye-closed hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path
-                                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
-                                        </path>
-                                        <line x1="1" y1="1" x2="23" y2="23"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-primary btn-full">
-                            <span class="btn-text">Entrar</span>
-                            <span class="btn-loader"></span>
+                    <h1 class="hero-title">
+                        Construa, Personalize e Distribua o <br>
+                        <span class="gradient-text">Black Screen Tool</span> com 1 Clique
+                    </h1>
+
+                    <p class="hero-description">
+                        Plataforma de alta performance com compilação nativa em .NET 9. Cada usuário possui configurações, senhas, logos e downloads totalmente isolados na sua própria conta segura.
+                    </p>
+
+                    <div class="hero-actions">
+                        <button class="btn-hero-primary" onclick="App.showAuth('register')">
+                            <span>Começar Agora Gratuitamente</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
                         </button>
-                    </form>
+                        <button class="btn-hero-secondary" onclick="App.showAuth('login')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                                <polyline points="10 17 15 12 10 7"></polyline>
+                                <line x1="15" y1="12" x2="3" y2="12"></line>
+                            </svg>
+                            <span>Acessar Minha Conta</span>
+                        </button>
+                    </div>
 
-                    <!-- Register Form -->
-                    <form id="register-form" class="auth-form">
-                        <div class="form-group">
-                            <label for="register-name">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                                Nome Completo
-                            </label>
-                            <input type="text" id="register-name" placeholder="Seu nome" required>
+                    <!-- Trust Badges -->
+                    <div class="hero-badges">
+                        <div class="hero-badge-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Multi-Usuários 100% Isolados</span>
                         </div>
-                        <div class="form-group">
-                            <label for="register-email">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path
-                                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
-                                    </path>
-                                    <polyline points="22,6 12,13 2,6"></polyline>
-                                </svg>
-                                Email
-                            </label>
-                            <input type="email" id="register-email" placeholder="seu@email.com" required>
+                        <div class="hero-badge-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Compilador .NET 9 Nativo</span>
                         </div>
-                        <div class="form-group">
-                            <label for="register-password">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                </svg>
-                                Senha
-                            </label>
-                            <input type="password" id="register-password" placeholder="Mínimo 6 caracteres" required
-                                autocomplete="new-password">
+                        <div class="hero-badge-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>Downloads Privados Protegidos</span>
                         </div>
-                        <div class="form-group">
-                            <label for="register-confirm">
+                    </div>
+
+                    <!-- Mockup Card -->
+                    <div class="hero-mockup-wrapper">
+                        <div class="hero-mockup-card">
+                            <div class="mockup-header">
+                                <div class="mockup-dots">
+                                    <div class="mockup-dot red"></div>
+                                    <div class="mockup-dot yellow"></div>
+                                    <div class="mockup-dot green"></div>
+                                </div>
+                                <span class="mockup-title">BlackTool Studio Cloud Pipeline</span>
+                                <span class="mockup-badge">ONLINE</span>
+                            </div>
+                            <div class="mockup-content">
+                                <div class="mockup-pane">
+                                    <h4>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="3" width="7" height="9"></rect>
+                                            <rect x="14" y="3" width="7" height="5"></rect>
+                                            <rect x="14" y="12" width="7" height="9"></rect>
+                                        </svg>
+                                        Painel de Métricas Isoladas
+                                    </h4>
+                                    <div class="mockup-stat-grid">
+                                        <div class="mockup-stat-box">
+                                            <div class="label">Quota Mensal</div>
+                                            <div class="value">5 / 5 Disponíveis</div>
+                                        </div>
+                                        <div class="mockup-stat-box">
+                                            <div class="label">Storage Privativo</div>
+                                            <div class="value" style="color:var(--accent-green)">storage/users/id</div>
+                                        </div>
+                                        <div class="mockup-stat-box">
+                                            <div class="label">Tempo Médio</div>
+                                            <div class="value">~3.5s</div>
+                                        </div>
+                                        <div class="mockup-stat-box">
+                                            <div class="label">Sistema Alvo</div>
+                                            <div class="value">Win-x64 Release</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mockup-pane">
+                                    <h4>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="4 17 10 11 4 5"></polyline>
+                                            <line x1="12" y1="19" x2="20" y2="19"></line>
+                                        </svg>
+                                        Terminal de Build em Tempo Real
+                                    </h4>
+                                    <div class="mockup-terminal">
+                                        <span class="t-purple">&gt; dotnet publish</span> -c Release -r win-x64<br>
+                                        <span class="t-cyan">&gt; Carregando credenciais isoladas do usuário...</span><br>
+                                        <span class="t-cyan">&gt; Sincronizando assets privativos (PNG, ICO, GIF)...</span><br>
+                                        <span class="t-green">&#10004; Compilação concluída com sucesso!</span><br>
+                                        <span class="t-green">&#10004; Pacote .zip gerado no storage exclusivo do usuário.</span><br>
+                                        <span class="t-purple">&gt; Download autenticado pronto para distribuição.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Features Section -->
+                <section id="features" class="landing-features">
+                    <div class="section-header">
+                        <h2>Arquitetura Multi-Tenant Isolada</h2>
+                        <p>Total privacidade para suas credenciais, personalizações visuais e arquivos de compilação.</p>
+                    </div>
+
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                                 </svg>
-                                Confirmar Senha
-                            </label>
-                            <input type="password" id="register-confirm" placeholder="Repita a senha" required
-                                autocomplete="new-password">
+                            </div>
+                            <h3>Multi-Usuários 100% Isolados</h3>
+                            <p>Cada conta tem sua própria base de configurações, senha de desbloqueio, mensagem na tela e pasta de arquivos sem interferência entre contas.</p>
                         </div>
-                        <button type="submit" class="btn-primary btn-full">
-                            <span class="btn-text">Criar Conta</span>
-                            <span class="btn-loader"></span>
+
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                    <polyline points="2 17 12 22 22 17"></polyline>
+                                    <polyline points="2 12 12 17 22 12"></polyline>
+                                </svg>
+                            </div>
+                            <h3>Compilador Nativo .NET 9</h3>
+                            <p>Executáveis Windows de alto desempenho gerados diretamente na nuvem em contêineres otimizados e prontos para distribuição.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                            </div>
+                            <h3>Assets & Marcas Privativas</h3>
+                            <p>Envie logotipos transparentes (PNG), ícones de executável (.ICO) e logos animadas (.GIF) vinculadas estritamente ao seu perfil.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </div>
+                            <h3>Segurança Criptografada JWT</h3>
+                            <p>Tokens com assinatura segura e expiração controlada. Proteção contra acessos não autorizados ou downloads cruzados.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            <h3>Histórico & Re-Download Direto</h3>
+                            <p>Acesse a qualquer instante todos os builds gerados pela sua conta com link direto de download do arquivo ZIP compilado.</p>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon-wrapper">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                </svg>
+                            </div>
+                            <h3>Painel Administrativo Completo</h3>
+                            <p>Visão global para administradores com logs de auditoria detalhados, controle de cotas de compilação e gestão de membros.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- How It Works Section -->
+                <section id="how-it-works" class="landing-steps">
+                    <div class="section-header">
+                        <h2>Como Funciona</h2>
+                        <p>Três passos simples para gerar e distribuir sua versão customizada.</p>
+                    </div>
+
+                    <div class="steps-grid">
+                        <div class="step-card">
+                            <div class="step-number">1</div>
+                            <h3>Configure os Dados</h3>
+                            <p>Defina a senha correta de desbloqueio e a mensagem personalizada exibida no aplicativo.</p>
+                        </div>
+                        <div class="step-card">
+                            <div class="step-number">2</div>
+                            <h3>Envie sua Identidade</h3>
+                            <p>Faça upload de logos PNG, ícones .ico e GIFs para seu armazenamento privativo.</p>
+                        </div>
+                        <div class="step-card">
+                            <div class="step-number">3</div>
+                            <h3>Gere & Distribua</h3>
+                            <p>Inicie a compilação e receba o ZIP final com o executável pronto para uso.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CTA Banner -->
+                <section class="landing-cta" id="status-section">
+                    <div class="cta-box">
+                        <h2>Pronto para criar seu primeiro build?</h2>
+                        <p>Cadastre-se gratuitamente e aproveite o painel de compilação automatizada com segurança total.</p>
+                        <button class="btn-hero-primary" onclick="App.showAuth('register')">
+                            <span>Criar Minha Conta Grátis</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
                         </button>
-                    </form>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <footer class="landing-footer">
+                    <div class="footer-brand">
+                        <div class="logo-icon" style="width:28px;height:28px;border-radius:6px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                <path d="M2 17l10 5 10-5"></path>
+                                <path d="M2 12l10 5 10-5"></path>
+                            </svg>
+                        </div>
+                        <span>BlackTool &copy; 2026. Todos os direitos reservados.</span>
+                    </div>
+
+                    <div class="footer-status">
+                        <span class="dot"></span>
+                        <span>Serviço Online em 0.0.0.0 • .NET 9 SDK Operacional</span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+
+        <!-- Auth View (Horizontal Split Login/Register) -->
+        <div id="auth-view" class="view">
+            <div class="auth-container">
+                <div class="auth-split-card">
+                    <!-- Left Column: Showcase & Brand -->
+                    <div class="auth-showcase-panel">
+                        <button class="auth-back-link" onclick="App.showLanding()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="19" y1="12" x2="5" y2="12"></line>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                            <span>Voltar para a Página Inicial</span>
+                        </button>
+
+                        <div class="auth-showcase-content">
+                            <div class="showcase-brand">
+                                <div class="logo-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                        <path d="M2 17l10 5 10-5"></path>
+                                        <path d="M2 12l10 5 10-5"></path>
+                                    </svg>
+                                </div>
+                                <h2>Black<span class="gradient-text">Tool</span></h2>
+                            </div>
+                            <p class="showcase-tagline">
+                                Painel de Compilação & Automação com Isolamento Multi-Usuário.
+                            </p>
+
+                            <ul class="showcase-features">
+                                <li class="showcase-feature-item">
+                                    <div class="feature-check-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="feature-text">
+                                        <strong>Espaço 100% Isolado</strong>
+                                        <span>Suas senhas, mensagens e logos ficam privativos na sua conta</span>
+                                    </div>
+                                </li>
+                                <li class="showcase-feature-item">
+                                    <div class="feature-check-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="feature-text">
+                                        <strong>Compilação .NET 9 em Nuvem</strong>
+                                        <span>Builds instantâneos com injeção automática de parâmetros</span>
+                                    </div>
+                                </li>
+                                <li class="showcase-feature-item">
+                                    <div class="feature-check-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="feature-text">
+                                        <strong>Downloads Protegidos</strong>
+                                        <span>Histórico persistente e links de download autenticados</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="showcase-mini-card">
+                            <div class="mini-card-info">
+                                <div class="mini-card-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                        <polyline points="2 17 12 22 22 17"></polyline>
+                                        <polyline points="2 12 12 17 22 12"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="mini-card-text">
+                                    <div class="title">Status do Servidor</div>
+                                    <div class="sub">Compilador Ativo • 0.0.0.0</div>
+                                </div>
+                            </div>
+                            <span class="mini-card-badge">OPERACIONAL</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Form Panel -->
+                    <div class="auth-form-panel">
+                        <div class="auth-form-header">
+                            <h3 id="auth-panel-title">Acesse sua Conta</h3>
+                            <p id="auth-panel-subtitle">Entre com suas credenciais para gerenciar seus builds</p>
+                        </div>
+
+                        <!-- Tab Navigation -->
+                        <div class="auth-tabs">
+                            <button class="tab-btn active" data-tab="login">Entrar</button>
+                            <button class="tab-btn" data-tab="register">Criar Conta</button>
+                            <div class="tab-indicator"></div>
+                        </div>
+
+                        <!-- Login Form -->
+                        <form id="login-form" class="auth-form active">
+                            <div class="form-group">
+                                <label for="login-email">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                    </svg>
+                                    Email
+                                </label>
+                                <input type="email" id="login-email" placeholder="seu@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                    Senha
+                                </label>
+                                <div class="password-input">
+                                    <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+                                    <button type="button" class="toggle-password">
+                                        <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        <svg class="eye-closed hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary btn-full">
+                                <span class="btn-text">Entrar no Painel</span>
+                                <span class="btn-loader"></span>
+                            </button>
+
+                            <div id="resend-verification-box" style="display:none;"></div>
+
+                            <!-- Quick Fill Accounts for Demo Convenience -->
+                            <div class="demo-accounts-bar">
+                                <span class="demo-label">Contas de Demonstração Rápidas</span>
+                                <div class="demo-buttons">
+                                    <button type="button" class="btn-demo-quick" onclick="Auth.fillDemo('admin')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                        </svg>
+                                        Admin Demo
+                                    </button>
+                                    <button type="button" class="btn-demo-quick" onclick="Auth.fillDemo('user')">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                        Usuário Demo
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Register Form -->
+                        <form id="register-form" class="auth-form">
+                            <div class="form-group">
+                                <label for="register-name">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    Nome Completo
+                                </label>
+                                <input type="text" id="register-name" placeholder="Seu nome completo" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-email">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                    </svg>
+                                    Email
+                                </label>
+                                <input type="email" id="register-email" placeholder="seu@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                    Senha
+                                </label>
+                                <input type="password" id="register-password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password">
+                            </div>
+                            <div class="form-group">
+                                <label for="register-confirm">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                    </svg>
+                                    Confirmar Senha
+                                </label>
+                                <input type="password" id="register-confirm" placeholder="Repita sua senha" required autocomplete="new-password">
+                            </div>
+                            <button type="submit" class="btn-primary btn-full">
+                                <span class="btn-text">Criar Minha Conta Isolada</span>
+                                <span class="btn-loader"></span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -391,11 +767,12 @@
                                         <th>Tamanho</th>
                                         <th>Downloads</th>
                                         <th>Data</th>
+                                        <th>Ação</th>
                                     </tr>
                                 </thead>
                                 <tbody id="history-table-body">
                                     <tr>
-                                        <td colspan="6" class="empty-message">Carregando...</td>
+                                        <td colspan="7" class="empty-message">Carregando...</td>
                                     </tr>
                                 </tbody>
                             </table>

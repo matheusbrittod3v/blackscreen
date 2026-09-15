@@ -118,7 +118,7 @@ const Dashboard = {
             const tbody = document.getElementById('history-table-body');
 
             if (builds.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-message">Nenhum build encontrado.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-message">Nenhum build encontrado.</td></tr>';
                 return;
             }
 
@@ -130,6 +130,12 @@ const Dashboard = {
                     <td>${formatFileSize(build.fileSize)}</td>
                     <td>${build.downloadCount || 0}</td>
                     <td>${formatDate(build.createdAt)}</td>
+                    <td>
+                        ${build.status === 'completed'
+                            ? `<a href="/api/build/download/${build.id}?token=${API.token}" class="btn-table-action" download>Baixar ZIP</a>`
+                            : `<span style="color:var(--text-muted);font-size:0.75rem;">-</span>`
+                        }
+                    </td>
                 </tr>
             `).join('');
         } catch (error) {

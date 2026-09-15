@@ -7,6 +7,9 @@ class User {
         role = 'user',
         monthlyBuildLimit = 5,
         isActive = true,
+        emailVerified = false,
+        verificationToken = null,
+        verificationTokenExpires = null,
         createdAt = new Date(),
         updatedAt = new Date()
     }) {
@@ -17,6 +20,9 @@ class User {
         this.role = role;
         this.monthlyBuildLimit = monthlyBuildLimit;
         this.isActive = isActive;
+        this.emailVerified = emailVerified;
+        this.verificationToken = verificationToken;
+        this.verificationTokenExpires = verificationTokenExpires;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -37,6 +43,7 @@ class User {
             role: this.role,
             monthlyBuildLimit: this.monthlyBuildLimit,
             isActive: this.isActive,
+            emailVerified: this.emailVerified,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt
         };
@@ -51,6 +58,9 @@ class User {
             role: row.role,
             monthlyBuildLimit: row.monthly_build_limit,
             isActive: row.is_active === 1,
+            emailVerified: row.email_verified === 1 || row.email_verified === true,
+            verificationToken: row.verification_token,
+            verificationTokenExpires: row.verification_token_expires,
             createdAt: row.created_at,
             updatedAt: row.updated_at
         });

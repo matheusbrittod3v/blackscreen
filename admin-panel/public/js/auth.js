@@ -6,30 +6,74 @@ const Auth = {
         this.setupTabs();
         this.setupForms();
         this.setupPasswordToggle();
+        this.checkUrlParams();
+    },
+
+    checkUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('verified') === '1') {
+            App.showAuth('login');
+            setTimeout(() => {
+                showToast('🎉 E-mail confirmado com sucesso! Você já pode entrar.', 'success');
+            }, 300);
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else if (params.get('verify_error')) {
+            App.showAuth('login');
+            setTimeout(() => {
+                showToast('⚠️ Link de confirmação inválido ou expirado. Solicite um novo abaixo.', 'error');
+            }, 300);
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     },
 
     setupTabs() {
         const tabs = document.querySelectorAll('.tab-btn');
-        const forms = document.querySelectorAll('.auth-form');
-        const indicator = document.querySelector('.tab-indicator');
-
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 const target = tab.dataset.tab;
-
-                // Update tabs
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-
-                // Update forms
-                forms.forEach(form => {
-                    form.classList.remove('active');
-                    if (form.id === `${target}-form`) {
-                        form.classList.add('active');
-                    }
-                });
+                this.switchTab(target);
             });
         });
+    },
+
+    switchTab(target) {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const forms = document.querySelectorAll('.auth-form');
+        const title = document.getElementById('auth-panel-title');
+        const subtitle = document.getElementById('auth-panel-subtitle');
+
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === target));
+        forms.forEach(form => {
+            form.classList.toggle('active', form.id === `${target}-form`);
+        });
+
+        // Hide resend box when switching tabs
+        const resendBox = document.getElementById('resend-verification-box');
+        if (resendBox) resendBox.style.display = 'none';
+
+        if (title && subtitle) {
+            if (target === 'register') {
+                title.textContent = 'Crie sua Conta Isolada';
+                subtitle.textContent = 'Cadastre-se para obter um espaço privativo de builds e configurações';
+            } else {
+                title.textContent = 'Acesse sua Conta';
+                subtitle.textContent = 'Entre com suas credenciais para gerenciar seus builds';
+            }
+        }
+    },
+
+    fillDemo(type) {
+        this.switchTab('login');
+        const emailInput = document.getElementById('login-email');
+        const passwordInput = document.getElementById('login-password');
+        if (type === 'admin') {
+            emailInput.value = 'admin@blacktool.com';
+            passwordInput.value = 'admin123';
+        } else {
+            emailInput.value = 'user@blacktool.com';
+            passwordInput.value = 'user123';
+        }
+        showToast(`Credenciais de ${type === 'admin' ? 'Administrador' : 'Usuário'} preenchidas!`, 'info');
     },
 
     setupForms() {
@@ -38,6 +82,9 @@ const Auth = {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
             btn.classList.add('loading');
+
+            const resendBox = document.getElementById('resend-verification-box');
+            if (resendBox) resendBox.style.display = 'none';
 
             try {
                 const email = document.getElementById('login-email').value;
@@ -52,6 +99,10 @@ const Auth = {
                 App.showDashboard();
             } catch (error) {
                 showToast(error.message, 'error');
+
+                if (error.data?.emailNotVerified || error.message?.includes('confirme seu e-mail')) {
+                    this.showResendOption(document.getElementById('login-email').value);
+                }
             } finally {
                 btn.classList.remove('loading');
             }
@@ -77,17 +128,75 @@ const Auth = {
                     name, email, password, confirmPassword
                 });
 
-                API.setToken(data.token);
-                this.currentUser = data.user;
-
-                showToast('Conta criada com sucesso!', 'success');
-                App.showDashboard();
+                if (data.requireVerification) {
+                    showToast(data.message, 'success');
+                    this.switchTab('login');
+                    document.getElementById('login-email').value = email;
+                    document.getElementById('login-password').value = '';
+                    document.getElementById('register-form').reset();
+                    this.showVerificationAlert(email);
+                } else if (data.token) {
+                    API.setToken(data.token);
+                    this.currentUser = data.user;
+                    showToast('Conta criada com sucesso!', 'success');
+                    App.showDashboard();
+                }
             } catch (error) {
                 showToast(error.message, 'error');
             } finally {
                 btn.classList.remove('loading');
             }
         });
+    },
+
+    showVerificationAlert(email) {
+        const box = document.getElementById('resend-verification-box');
+        if (box) {
+            box.innerHTML = `
+                <div style="background:rgba(108,92,231,0.15);border:1px solid rgba(108,92,231,0.35);border-radius:8px;padding:12px 14px;margin-top:14px;text-align:center;">
+                    <p style="font-size:0.8rem;color:#cbd5e1;margin:0 0 8px;">
+                        📧 Enviamos um e-mail com link de confirmação para <strong>${email}</strong>.
+                    </p>
+                    <button type="button" class="btn-demo-quick" style="width:100%;padding:6px 10px;" onclick="Auth.resendVerification('${email}')">
+                        Reenviar E-mail de Confirmação
+                    </button>
+                </div>
+            `;
+            box.style.display = 'block';
+        }
+    },
+
+    showResendOption(email) {
+        const box = document.getElementById('resend-verification-box');
+        if (box) {
+            box.innerHTML = `
+                <div style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:12px 14px;margin-top:14px;text-align:center;">
+                    <p style="font-size:0.8rem;color:#fca5a5;margin:0 0 8px;">
+                        ⚠️ Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada e spam.
+                    </p>
+                    <button type="button" class="btn-demo-quick" style="width:100%;padding:6px 10px;" onclick="Auth.resendVerification('${email}')">
+                        Reenviar Link de Confirmação
+                    </button>
+                </div>
+            `;
+            box.style.display = 'block';
+        }
+    },
+
+    async resendVerification(email) {
+        if (!email) {
+            email = document.getElementById('login-email').value;
+        }
+        if (!email) {
+            return showToast('Por favor, informe seu e-mail no campo de login.', 'error');
+        }
+
+        try {
+            const data = await API.post('/api/auth/resend-verification', { email });
+            showToast(data.message, 'success');
+        } catch (error) {
+            showToast(error.message, 'error');
+        }
     },
 
     setupPasswordToggle() {
@@ -126,7 +235,7 @@ const Auth = {
     logout() {
         API.setToken(null);
         this.currentUser = null;
-        App.showAuth();
-        showToast('Logout realizado', 'info');
+        App.showLanding();
+        showToast('Logout realizado com sucesso', 'info');
     }
 };

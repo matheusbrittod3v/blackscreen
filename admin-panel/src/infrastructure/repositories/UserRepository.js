@@ -15,6 +15,31 @@ class UserRepository {
         return User.fromDatabase(rows[0]);
     }
 
+    async findByVerificationToken(token) {
+        const rows = await query(
+            'SELECT * FROM users WHERE verification_token = ? AND (verification_token_expires IS NULL OR verification_token_expires > NOW())',
+            [token]
+        );
+        if (rows.length === 0) return null;
+        return User.fromDatabase(rows[0]);
+    }
+
+    async setVerificationToken(userId, token, expiresAt) {
+        await query(
+            'UPDATE users SET verification_token = ?, verification_token_expires = ? WHERE id = ?',
+            [token, expiresAt, userId]
+        );
+        return this.findById(userId);
+    }
+
+    async verifyEmail(userId) {
+        await query(
+            'UPDATE users SET email_verified = TRUE, verification_token = NULL, verification_token_expires = NULL WHERE id = ?',
+            [userId]
+        );
+        return this.findById(userId);
+    }
+
     async findAll(options = {}) {
         let sql = 'SELECT * FROM users';
         const params = [];
@@ -49,15 +74,18 @@ class UserRepository {
         const hashedPassword = await bcrypt.hash(userData.password, 12);
 
         const result = await query(
-            `INSERT INTO users (name, email, password, role, monthly_build_limit, is_active) 
-             VALUES (?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO users (name, email, password, role, monthly_build_limit, is_active, email_verified, verification_token, verification_token_expires) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 userData.name,
                 userData.email,
                 hashedPassword,
                 userData.role || 'user',
                 userData.monthlyBuildLimit || 5,
-                userData.isActive !== false ? 1 : 0
+                userData.isActive !== false ? 1 : 0,
+                userData.emailVerified ? 1 : 0,
+                userData.verificationToken || null,
+                userData.verificationTokenExpires || null
             ]
         );
 
@@ -97,6 +125,21 @@ class UserRepository {
         if (userData.isActive !== undefined) {
             updates.push('is_active = ?');
             params.push(userData.isActive ? 1 : 0);
+        }
+
+        if (userData.emailVerified !== undefined) {
+            updates.push('email_verified = ?');
+            params.push(userData.emailVerified ? 1 : 0);
+        }
+
+        if (userData.verificationToken !== undefined) {
+            updates.push('verification_token = ?');
+            params.push(userData.verificationToken);
+        }
+
+        if (userData.verificationTokenExpires !== undefined) {
+            updates.push('verification_token_expires = ?');
+            params.push(userData.verificationTokenExpires);
         }
 
         if (updates.length === 0) return this.findById(id);
