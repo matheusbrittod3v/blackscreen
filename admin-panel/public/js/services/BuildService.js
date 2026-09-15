@@ -98,19 +98,32 @@ class BuildService {
     }
 
     setupFileUploads() {
-        const uploadBtn = document.getElementById('uploadAssets');
         const convertBtn = document.getElementById('convertPngToIco');
-        const pngInput = document.getElementById('file-png');
 
         ['file-png', 'file-ico', 'file-gif'].forEach(id => {
             const input = document.getElementById(id);
             if (!input) return;
             const zone = input.closest('.drop-zone');
-            input.addEventListener('change', (e) => {
+            input.addEventListener('change', async (e) => {
                 if (e.target.files.length > 0 && zone) {
+                    const file = e.target.files[0];
                     zone.classList.add('selected');
                     const p = zone.querySelector('p');
-                    if (p) p.textContent = Utils.escapeHtml(e.target.files[0].name);
+                    if (p) p.textContent = Utils.escapeHtml(file.name);
+
+                    // Automatically upload file on selection!
+                    const formData = new FormData();
+                    if (id === 'file-png') formData.append('logo_png', file);
+                    else if (id === 'file-ico') formData.append('logo_ico', file);
+                    else if (id === 'file-gif') formData.append('logo_gif', file);
+
+                    try {
+                        const result = await API.upload('/api/build/upload', formData);
+                        Utils.showToast(`✨ ${file.name} sincronizado automaticamente!`, 'success');
+                    } catch (uploadErr) {
+                        console.error('Auto upload error:', uploadErr);
+                        Utils.showToast(`❌ Erro ao enviar ${file.name}: ${uploadErr.message}`, 'error');
+                    }
 
                     // Enable convert button if PNG selected
                     if (id === 'file-png' && convertBtn) {
@@ -123,38 +136,8 @@ class BuildService {
             });
         });
 
-        if (uploadBtn) {
-            uploadBtn.addEventListener('click', async () => {
-                const pngFile = document.getElementById('file-png')?.files[0];
-                const icoFile = document.getElementById('file-ico')?.files[0];
-                const gifFile = document.getElementById('file-gif')?.files[0];
-
-                if (!pngFile && !icoFile && !gifFile) return Utils.showToast('Selecione ao menos um arquivo para enviar.', 'error');
-                uploadBtn.disabled = true;
-                const formData = new FormData();
-                if (pngFile) formData.append('logo_png', pngFile);
-                if (icoFile) formData.append('logo_ico', icoFile);
-                if (gifFile) formData.append('logo_gif', gifFile);
-
-                try {
-                    const result = await API.upload('/api/build/upload', formData);
-                    Utils.showToast(result.message || 'Arquivos enviados com sucesso!', 'success');
-                    if (pngFile && convertBtn) {
-                        convertBtn.disabled = false;
-                        convertBtn.style.opacity = '1';
-                        convertBtn.style.cursor = 'pointer';
-                    }
-                } catch (error) {
-                    Utils.showToast(error.message, 'error');
-                } finally {
-                    uploadBtn.disabled = false;
-                }
-            });
-        }
-
         if (convertBtn) {
             convertBtn.addEventListener('click', async () => {
-                // If user selected a new PNG file but hasn't uploaded it yet, upload it first
                 const pngFile = document.getElementById('file-png')?.files[0];
                 if (pngFile) {
                     const formData = new FormData();
@@ -234,6 +217,18 @@ class BuildService {
             Utils.showToast('⏳ Adicionando build à fila de compilação...', 'info');
 
             try {
+                // Auto sync selected files if any were chosen right before build
+                const pngFile = document.getElementById('file-png')?.files[0];
+                const icoFile = document.getElementById('file-ico')?.files[0];
+                const gifFile = document.getElementById('file-gif')?.files[0];
+                if (pngFile || icoFile || gifFile) {
+                    const formData = new FormData();
+                    if (pngFile) formData.append('logo_png', pngFile);
+                    if (icoFile) formData.append('logo_ico', icoFile);
+                    if (gifFile) formData.append('logo_gif', gifFile);
+                    await API.upload('/api/build/upload', formData).catch(() => {});
+                }
+
                 const CorrectPassword = document.getElementById('correctPassword')?.value || '';
                 const CustomMessage = document.getElementById('customMessage')?.value || '';
                 const result = await API.post('/api/build/generate', { buildName, CorrectPassword, CustomMessage });

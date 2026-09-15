@@ -8,6 +8,7 @@ const activityLogRepository = require('../repositories/ActivityLogRepository');
 
 const projectRoot = path.join(__dirname, '..', '..', '..');
 const globalUtilPath = path.join(projectRoot, 'util');
+const masterImgPath = path.join(projectRoot, 'img');
 
 class BuildWorker {
     constructor() {
@@ -49,6 +50,14 @@ class BuildWorker {
             });
 
             // 2. Prepare user's util folder and sync into build environment
+            const defaults = ['logo.png', 'logo.ico'];
+            for (const defaultFile of defaults) {
+                const userFile = path.join(job.userUtil, defaultFile);
+                const masterFile = path.join(masterImgPath, defaultFile);
+                if (!(await fs.pathExists(userFile)) && (await fs.pathExists(masterFile))) {
+                    await fs.copy(masterFile, userFile);
+                }
+            }
             await fs.copy(job.userUtil, globalUtilPath);
 
             // 3. Prepare util.zip for compilation embedding
@@ -152,6 +161,21 @@ class BuildWorker {
             this.isWorking = false;
             buildQueue.activeJob = null;
             
+            // Restore default logo.png and logo.ico from img/ folder back into global util/
+            try {
+                const defaultPng = path.join(masterImgPath, 'logo.png');
+                const defaultIco = path.join(masterImgPath, 'logo.ico');
+                if (await fs.pathExists(defaultPng)) {
+                    await fs.copy(defaultPng, path.join(globalUtilPath, 'logo.png'));
+                }
+                if (await fs.pathExists(defaultIco)) {
+                    await fs.copy(defaultIco, path.join(globalUtilPath, 'logo.ico'));
+                }
+                console.log('[BuildWorker] 🔄 Logos padrão restaurados para a pasta util/');
+            } catch (restoreErr) {
+                console.error('[BuildWorker] Erro ao restaurar logos padrão:', restoreErr);
+            }
+
             // Immediately process next job in queue if any
             setImmediate(() => this.processNext());
         }

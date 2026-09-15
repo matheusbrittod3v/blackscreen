@@ -12,6 +12,7 @@ const buildQueue = require('../infrastructure/jobs/BuildQueue');
 
 const projectRoot = path.join(__dirname, '..', '..', '..');
 const globalUtilPath = path.join(projectRoot, 'util');
+const masterImgPath = path.join(projectRoot, 'img');
 const storageBase = path.join(projectRoot, 'storage', 'users');
 
 // Helper to handle ESM png-to-ico package dynamically in CommonJS
@@ -33,13 +34,19 @@ async function ensureUserStorage(userId) {
     await fs.ensureDir(userUtil);
     await fs.ensureDir(userBuilds);
 
-    // Copy pre-existing default logos from global util if missing
+    // Copy pre-existing default logos from master img/ or global util if missing
     const defaults = ['logo.png', 'logo.ico', 'logo.gif'];
     for (const file of defaults) {
         const userFilePath = path.join(userUtil, file);
+        const masterFilePath = path.join(masterImgPath, file);
         const globalFilePath = path.join(globalUtilPath, file);
-        if (!(await fs.pathExists(userFilePath)) && (await fs.pathExists(globalFilePath))) {
-            await fs.copy(globalFilePath, userFilePath);
+
+        if (!(await fs.pathExists(userFilePath))) {
+            if (await fs.pathExists(masterFilePath)) {
+                await fs.copy(masterFilePath, userFilePath);
+            } else if (await fs.pathExists(globalFilePath)) {
+                await fs.copy(globalFilePath, userFilePath);
+            }
         }
     }
 

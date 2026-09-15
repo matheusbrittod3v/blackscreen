@@ -181,8 +181,7 @@ class DashboardComponent {
                                     </div>
                                 </div>
                                 <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
-                                    <button id="uploadAssets" class="btn-secondary" style="flex:1;">Sincronizar Arquivos</button>
-                                    <button id="convertPngToIco" type="button" class="btn-secondary" disabled style="flex:1;opacity:0.5;cursor:not-allowed;" title="Selecione ou envie um logo.png para converter">⚡ Converter PNG &rarr; ICO</button>
+                                    <button id="convertPngToIco" type="button" class="btn-secondary" disabled style="width:100%;opacity:0.5;cursor:not-allowed;" title="Selecione um logo.png para converter em .ico">⚡ Converter PNG &rarr; ICO</button>
                                 </div>
                             </div>
                         </div>
