@@ -19,12 +19,12 @@ const App = {
 
     showLanding() {
         const landing = document.getElementById('landing-view');
-        const auth = document.getElementById('auth-view');
         const dashboard = document.getElementById('dashboard-view');
 
         if (landing) { landing.classList.add('active'); landing.style.display = 'block'; }
-        if (auth) { auth.classList.remove('active'); auth.style.display = 'none'; }
         if (dashboard) { dashboard.classList.remove('active'); dashboard.style.display = 'none'; }
+
+        this.closeAuthModal();
 
         // Update landing navbar action buttons according to auth state
         const actionsContainer = document.getElementById('landing-nav-auth-buttons');
@@ -41,31 +41,36 @@ const App = {
                 `;
             }
         }
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 
     showAuth(tab = 'login') {
-        const landing = document.getElementById('landing-view');
-        const auth = document.getElementById('auth-view');
-        const dashboard = document.getElementById('dashboard-view');
-
-        if (landing) { landing.classList.remove('active'); landing.style.display = 'none'; }
-        if (auth) { auth.classList.add('active'); auth.style.display = 'block'; }
-        if (dashboard) { dashboard.classList.remove('active'); dashboard.style.display = 'none'; }
+        const modal = document.getElementById('auth-modal');
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
 
         Auth.switchTab(tab);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+    closeAuthModal() {
+        const modal = document.getElementById('auth-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            modal.style.display = 'none';
+        }
+        document.body.style.overflow = '';
     },
 
     showDashboard() {
         const landing = document.getElementById('landing-view');
-        const auth = document.getElementById('auth-view');
         const dashboard = document.getElementById('dashboard-view');
 
         if (landing) { landing.classList.remove('active'); landing.style.display = 'none'; }
-        if (auth) { auth.classList.remove('active'); auth.style.display = 'none'; }
         if (dashboard) { dashboard.classList.add('active'); dashboard.style.display = 'block'; }
+
+        this.closeAuthModal();
 
         // Update user info
         Dashboard.updateUserInfo();
@@ -85,6 +90,13 @@ const App = {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 };
+
+// Listen for Escape key to close modal
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        App.closeAuthModal();
+    }
+});
 
 // Start app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
