@@ -35,8 +35,18 @@ const API = {
             const data = await response.json();
 
             if (!response.ok) {
+                // If 401 Unauthorized occurs while token was present, auto-expire session
+                if (response.status === 401 && this.token) {
+                    this.setToken(null);
+                    if (typeof Auth !== 'undefined') Auth.currentUser = null;
+                    if (typeof App !== 'undefined' && typeof App.showLanding === 'function') {
+                        App.showLanding();
+                        showToast('Sessão expirada. Por favor, faça login novamente.', 'warning');
+                    }
+                }
                 const err = new Error(data.error || 'Erro na requisição');
                 err.data = data;
+                err.status = response.status;
                 throw err;
             }
 

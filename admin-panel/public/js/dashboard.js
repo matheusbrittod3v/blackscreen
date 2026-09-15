@@ -18,6 +18,8 @@ const Dashboard = {
     },
 
     navigateTo(pageId) {
+        if (!pageId) pageId = 'user-dashboard';
+
         // Update nav items
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.toggle('active', item.dataset.page === pageId);
@@ -33,11 +35,19 @@ const Dashboard = {
             case 'user-dashboard':
                 this.loadUserDashboard();
                 break;
+            case 'build-page':
+                if (typeof Build !== 'undefined') {
+                    Build.loadSettings();
+                    Build.loadBuildLimit();
+                }
+                break;
             case 'history-page':
                 this.loadHistory();
                 break;
             case 'admin-dashboard':
-                Admin.loadDashboard();
+                if (typeof Admin !== 'undefined') {
+                    Admin.loadDashboard();
+                }
                 break;
         }
     },

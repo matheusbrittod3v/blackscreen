@@ -97,8 +97,11 @@ const Auth = {
                     API.setToken(data.token);
                     this.currentUser = data.user;
 
+                    const passInput = document.getElementById('login-password');
+                    if (passInput) passInput.value = '';
+
                     showToast('Login realizado com sucesso!', 'success');
-                    App.showDashboard();
+                    App.showDashboard('user-dashboard');
                 } catch (error) {
                     showToast(error.message, 'error');
 
@@ -244,6 +247,7 @@ const Auth = {
     logout() {
         API.setToken(null);
         this.currentUser = null;
+        document.body.classList.remove('is-admin');
         App.showLanding();
         showToast('Logout realizado com sucesso', 'info');
     }

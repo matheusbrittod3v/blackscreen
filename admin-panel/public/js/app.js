@@ -13,7 +13,7 @@ const App = {
             const isAuthenticated = await Auth.checkAuth();
             console.log('[App] isAuthenticated:', isAuthenticated);
             if (isAuthenticated) {
-                this.showDashboard();
+                this.showDashboard('user-dashboard');
             } else {
                 this.showLanding();
             }
@@ -39,6 +39,7 @@ const App = {
             landing.setAttribute('style', 'display:block !important; position:relative; z-index:1; min-height:100vh');
         }
 
+        document.body.classList.remove('is-admin');
         this.closeAuthModal();
 
         // Update landing navbar action buttons according to auth state
@@ -80,8 +81,8 @@ const App = {
         document.body.style.overflow = '';
     },
 
-    showDashboard() {
-        console.log('[App] showDashboard() called');
+    showDashboard(defaultPage = 'user-dashboard') {
+        console.log('[App] showDashboard() called with page:', defaultPage);
         const landing = document.getElementById('landing-view');
         const dashboard = document.getElementById('dashboard-view');
 
@@ -90,29 +91,27 @@ const App = {
             landing.className = 'view';
             landing.setAttribute('style', 'display:none !important');
         }
-        // Show dashboard with !important inline to beat any CSS rule
+        // Show dashboard container with !important inline to beat any CSS rule
         if (dashboard) {
             dashboard.className = 'view active';
             dashboard.setAttribute('style', 'display:flex !important; position:relative; z-index:1; min-height:100vh');
-            console.log('[App] dashboard display set to flex, className:', dashboard.className, 'computedDisplay:', getComputedStyle(dashboard).display);
         } else {
             console.error('[App] dashboard-view element NOT FOUND!');
+            return;
         }
 
         this.closeAuthModal();
 
-        // Update user info & load dashboard
-        try { Dashboard.updateUserInfo(); } catch(e) { console.warn('[App] updateUserInfo error:', e); }
-        try { Dashboard.loadUserDashboard(); } catch(e) { console.warn('[App] loadUserDashboard error:', e); }
-        try { Build.loadSettings(); } catch(e) {}
-        try { Build.loadBuildLimit(); } catch(e) {}
-
-        // If admin, show admin menu
+        // Admin menu visibility
         if (Auth.currentUser?.role === 'admin') {
             document.body.classList.add('is-admin');
         } else {
             document.body.classList.remove('is-admin');
         }
+
+        // Synchronize User Info & navigate to active section
+        try { Dashboard.updateUserInfo(); } catch(e) { console.warn('[App] updateUserInfo error:', e); }
+        try { Dashboard.navigateTo(defaultPage); } catch(e) { console.warn('[App] navigateTo error:', e); }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
