@@ -477,6 +477,12 @@ select {
     display: block !important;
 }
 
+#landing-view:not(.active),
+#auth-view:not(.active),
+#dashboard-view:not(.active) {
+    display: none !important;
+}
+
 /* ============================================
    RESPONSIVE
    ============================================ */

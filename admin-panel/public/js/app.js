@@ -18,9 +18,13 @@ const App = {
     },
 
     showLanding() {
-        document.getElementById('landing-view')?.classList.add('active');
-        document.getElementById('auth-view')?.classList.remove('active');
-        document.getElementById('dashboard-view')?.classList.remove('active');
+        const landing = document.getElementById('landing-view');
+        const auth = document.getElementById('auth-view');
+        const dashboard = document.getElementById('dashboard-view');
+
+        if (landing) { landing.classList.add('active'); landing.style.display = 'block'; }
+        if (auth) { auth.classList.remove('active'); auth.style.display = 'none'; }
+        if (dashboard) { dashboard.classList.remove('active'); dashboard.style.display = 'none'; }
 
         // Update landing navbar action buttons according to auth state
         const actionsContainer = document.getElementById('landing-nav-auth-buttons');
@@ -42,18 +46,26 @@ const App = {
     },
 
     showAuth(tab = 'login') {
-        document.getElementById('landing-view')?.classList.remove('active');
-        document.getElementById('auth-view')?.classList.add('active');
-        document.getElementById('dashboard-view')?.classList.remove('active');
+        const landing = document.getElementById('landing-view');
+        const auth = document.getElementById('auth-view');
+        const dashboard = document.getElementById('dashboard-view');
+
+        if (landing) { landing.classList.remove('active'); landing.style.display = 'none'; }
+        if (auth) { auth.classList.add('active'); auth.style.display = 'block'; }
+        if (dashboard) { dashboard.classList.remove('active'); dashboard.style.display = 'none'; }
 
         Auth.switchTab(tab);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 
     showDashboard() {
-        document.getElementById('landing-view')?.classList.remove('active');
-        document.getElementById('auth-view')?.classList.remove('active');
-        document.getElementById('dashboard-view')?.classList.add('active');
+        const landing = document.getElementById('landing-view');
+        const auth = document.getElementById('auth-view');
+        const dashboard = document.getElementById('dashboard-view');
+
+        if (landing) { landing.classList.remove('active'); landing.style.display = 'none'; }
+        if (auth) { auth.classList.remove('active'); auth.style.display = 'none'; }
+        if (dashboard) { dashboard.classList.add('active'); dashboard.style.display = 'block'; }
 
         // Update user info
         Dashboard.updateUserInfo();
