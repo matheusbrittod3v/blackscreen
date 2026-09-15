@@ -23,24 +23,20 @@ const App = {
         }
     },
 
-    _hideAllViews() {
-        const views = document.querySelectorAll('.view');
-        views.forEach(v => {
-            v.classList.remove('active');
-            v.style.display = 'none';
-        });
-    },
-
     showLanding() {
         console.log('[App] showLanding()');
-        this._hideAllViews();
-
         const landing = document.getElementById('landing-view');
+        const dashboard = document.getElementById('dashboard-view');
+
+        // Hide dashboard
+        if (dashboard) {
+            dashboard.className = 'view';
+            dashboard.setAttribute('style', 'display:none !important');
+        }
+        // Show landing
         if (landing) {
-            landing.classList.add('active');
-            landing.style.display = 'block';
-            landing.style.position = 'relative';
-            landing.style.zIndex = '1';
+            landing.className = 'view active';
+            landing.setAttribute('style', 'display:block !important; position:relative; z-index:1; min-height:100vh');
         }
 
         this.closeAuthModal();
@@ -85,15 +81,22 @@ const App = {
     },
 
     showDashboard() {
-        console.log('[App] showDashboard()');
-        this._hideAllViews();
-
+        console.log('[App] showDashboard() called');
+        const landing = document.getElementById('landing-view');
         const dashboard = document.getElementById('dashboard-view');
+
+        // Hide landing
+        if (landing) {
+            landing.className = 'view';
+            landing.setAttribute('style', 'display:none !important');
+        }
+        // Show dashboard with !important inline to beat any CSS rule
         if (dashboard) {
-            dashboard.classList.add('active');
-            dashboard.style.display = 'flex';
-            dashboard.style.position = 'relative';
-            dashboard.style.zIndex = '1';
+            dashboard.className = 'view active';
+            dashboard.setAttribute('style', 'display:flex !important; position:relative; z-index:1; min-height:100vh');
+            console.log('[App] dashboard display set to flex, className:', dashboard.className, 'computedDisplay:', getComputedStyle(dashboard).display);
+        } else {
+            console.error('[App] dashboard-view element NOT FOUND!');
         }
 
         this.closeAuthModal();

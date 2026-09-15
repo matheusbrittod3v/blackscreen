@@ -473,25 +473,10 @@ select {
 }
 
 /* ============================================
-   VIEWS
+   VIEWS - JS controls visibility via inline styles
    ============================================ */
 .view {
-    display: none !important;
     min-height: 100vh;
-}
-
-.view.active {
-    display: block !important;
-}
-
-#dashboard-view.active {
-    display: flex !important;
-}
-
-#landing-view:not(.active),
-#auth-view:not(.active),
-#dashboard-view:not(.active) {
-    display: none !important;
 }
 
 /* ============================================
