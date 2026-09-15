@@ -1,9 +1,12 @@
 /**
- * App Class - SPA Controller & Global Event Router
+ * App Class - SPA Controller, Component Mount & Global Event Router
  */
 class App {
     async init() {
-        console.log('[App] Initializing ES6 SPA Orchestrator...');
+        console.log('[App] Initializing Modular Component SPA...');
+
+        // Mount HTML Components into #app container
+        this.mountComponents();
 
         // Initialize services
         try { Auth.init(); } catch (e) { console.warn('[App] Auth init warning:', e); }
@@ -27,6 +30,21 @@ class App {
             }
         } else {
             this.showLanding();
+        }
+    }
+
+    mountComponents() {
+        const appContainer = document.getElementById('app');
+        if (!appContainer) return;
+
+        // Inject component HTML templates dynamically if container is empty
+        if (appContainer.children.length === 0) {
+            appContainer.innerHTML = `
+                ${LandingComponent.render()}
+                ${AuthModalComponent.render()}
+                ${DashboardComponent.render()}
+                ${AdminComponent.renderUserModal()}
+            `;
         }
     }
 
@@ -116,11 +134,11 @@ class App {
     }
 }
 
-// Instantiate and expose global App singleton
+// Global App Instance
 const windowApp = new App();
 window.App = windowApp;
 
-// Global ESC key listener for modal closing
+// Global ESC listener
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         windowApp.closeAuthModal();
