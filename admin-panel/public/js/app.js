@@ -1,31 +1,47 @@
 const App = {
     async init() {
+        console.log('[App] init() started');
+
         // Safe module initialization
-        try { Auth.init(); } catch (e) { console.warn('Auth init warning:', e); }
-        try { Dashboard.init(); } catch (e) { console.warn('Dashboard init warning:', e); }
-        try { Build.init(); } catch (e) { console.warn('Build init warning:', e); }
-        try { Admin.init(); } catch (e) { console.warn('Admin init warning:', e); }
+        try { Auth.init(); } catch (e) { console.warn('[App] Auth init warning:', e); }
+        try { Dashboard.init(); } catch (e) { console.warn('[App] Dashboard init warning:', e); }
+        try { Build.init(); } catch (e) { console.warn('[App] Build init warning:', e); }
+        try { Admin.init(); } catch (e) { console.warn('[App] Admin init warning:', e); }
 
         // Check auth state and show appropriate view
         try {
             const isAuthenticated = await Auth.checkAuth();
+            console.log('[App] isAuthenticated:', isAuthenticated);
             if (isAuthenticated) {
                 this.showDashboard();
             } else {
                 this.showLanding();
             }
         } catch (error) {
-            console.error('Check auth error:', error);
+            console.error('[App] Check auth error:', error);
             this.showLanding();
         }
     },
 
-    showLanding() {
-        const landing = document.getElementById('landing-view');
-        const dashboard = document.getElementById('dashboard-view');
+    _hideAllViews() {
+        const views = document.querySelectorAll('.view');
+        views.forEach(v => {
+            v.classList.remove('active');
+            v.style.display = 'none';
+        });
+    },
 
-        if (landing) { landing.classList.add('active'); landing.removeAttribute('style'); }
-        if (dashboard) { dashboard.classList.remove('active'); dashboard.removeAttribute('style'); }
+    showLanding() {
+        console.log('[App] showLanding()');
+        this._hideAllViews();
+
+        const landing = document.getElementById('landing-view');
+        if (landing) {
+            landing.classList.add('active');
+            landing.style.display = 'block';
+            landing.style.position = 'relative';
+            landing.style.zIndex = '1';
+        }
 
         this.closeAuthModal();
 
@@ -54,7 +70,7 @@ const App = {
             document.body.style.overflow = 'hidden';
         }
 
-        if (typeof Auth.switchTab === 'function') {
+        if (typeof Auth !== 'undefined' && typeof Auth.switchTab === 'function') {
             Auth.switchTab(tab);
         }
     },
@@ -69,19 +85,24 @@ const App = {
     },
 
     showDashboard() {
-        const landing = document.getElementById('landing-view');
-        const dashboard = document.getElementById('dashboard-view');
+        console.log('[App] showDashboard()');
+        this._hideAllViews();
 
-        if (landing) { landing.classList.remove('active'); landing.removeAttribute('style'); }
-        if (dashboard) { dashboard.classList.add('active'); dashboard.removeAttribute('style'); }
+        const dashboard = document.getElementById('dashboard-view');
+        if (dashboard) {
+            dashboard.classList.add('active');
+            dashboard.style.display = 'flex';
+            dashboard.style.position = 'relative';
+            dashboard.style.zIndex = '1';
+        }
 
         this.closeAuthModal();
 
         // Update user info & load dashboard
-        try { Dashboard.updateUserInfo(); } catch(e){}
-        try { Dashboard.loadUserDashboard(); } catch(e){}
-        try { Build.loadSettings(); } catch(e){}
-        try { Build.loadBuildLimit(); } catch(e){}
+        try { Dashboard.updateUserInfo(); } catch(e) { console.warn('[App] updateUserInfo error:', e); }
+        try { Dashboard.loadUserDashboard(); } catch(e) { console.warn('[App] loadUserDashboard error:', e); }
+        try { Build.loadSettings(); } catch(e) {}
+        try { Build.loadBuildLimit(); } catch(e) {}
 
         // If admin, show admin menu
         if (Auth.currentUser?.role === 'admin') {

@@ -127,6 +127,11 @@ select {
     pointer-events: none;
 }
 
+#app {
+    position: relative;
+    z-index: 1;
+}
+
 .gradient-orb {
     position: absolute;
     border-radius: 50%;
