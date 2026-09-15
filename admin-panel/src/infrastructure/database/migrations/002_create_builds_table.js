@@ -10,7 +10,7 @@ module.exports = {
                 password_used VARCHAR(255),
                 custom_message TEXT,
                 logo_type ENUM('png', 'gif', 'ico') DEFAULT 'png',
-                status ENUM('pending', 'building', 'completed', 'failed') DEFAULT 'pending',
+                status VARCHAR(50) DEFAULT 'pending',
                 file_size BIGINT DEFAULT 0,
                 download_count INT DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

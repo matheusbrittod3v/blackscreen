@@ -60,6 +60,7 @@ async function start() {
             require('./infrastructure/database/migrations/006_create_user_settings_table'),
             require('./infrastructure/database/migrations/007_add_email_verification_to_users'),
             require('./infrastructure/database/migrations/008_seed_default_admin'),
+            require('./infrastructure/database/migrations/009_update_builds_status_column'),
         ];
 
         const [executed] = await connection.execute('SELECT name FROM migrations');
