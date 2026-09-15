@@ -32,20 +32,19 @@
 }
 
 .landing-brand .logo-icon {
-    width: 42px;
-    height: 42px;
+    width: 64px;
+    height: 64px;
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, var(--primary), var(--accent-pink));
+    background: transparent !important;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 20px var(--primary-glow);
+    filter: drop-shadow(0 0 18px rgba(225, 29, 72, 0.6));
+    transition: transform var(--transition-normal);
 }
 
-.landing-brand .logo-icon svg {
-    width: 24px;
-    height: 24px;
-    color: #fff;
+.landing-brand:hover .logo-icon {
+    transform: scale(1.08) rotate(-2deg);
 }
 
 .landing-brand span {

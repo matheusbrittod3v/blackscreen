@@ -2,34 +2,34 @@
    DESIGN TOKENS & VARIABLES
    ============================================ */
 :root {
-    /* Primary Colors */
-    --primary-hue: 250;
-    --primary: hsl(var(--primary-hue), 91%, 65%);
-    --primary-dark: hsl(var(--primary-hue), 91%, 55%);
-    --primary-light: hsl(var(--primary-hue), 91%, 75%);
-    --primary-glow: hsla(var(--primary-hue), 91%, 65%, 0.4);
+    /* Primary Colors (Crimson Red & Metallic Silver Hydra Theme) */
+    --primary-hue: 348;
+    --primary: hsl(var(--primary-hue), 83%, 48%);
+    --primary-dark: hsl(var(--primary-hue), 85%, 38%);
+    --primary-light: hsl(var(--primary-hue), 90%, 65%);
+    --primary-glow: rgba(225, 29, 72, 0.45);
 
     /* Accent Colors */
-    --accent-pink: hsl(330, 85%, 60%);
-    --accent-cyan: hsl(190, 95%, 55%);
-    --accent-orange: hsl(30, 95%, 55%);
-    --accent-green: hsl(150, 80%, 50%);
+    --accent-pink: hsl(350, 100%, 58%);
+    --accent-cyan: hsl(210, 40%, 90%);
+    --accent-orange: hsl(15, 95%, 55%);
+    --accent-green: hsl(145, 80%, 48%);
 
-    /* Dark Theme */
-    --bg-primary: hsl(230, 25%, 7%);
-    --bg-secondary: hsl(230, 25%, 10%);
-    --bg-tertiary: hsl(230, 25%, 14%);
-    --bg-card: hsla(230, 25%, 15%, 0.6);
+    /* Dark Obsidian Theme */
+    --bg-primary: #07070a;
+    --bg-secondary: #0e0f17;
+    --bg-tertiary: #151624;
+    --bg-card: rgba(21, 22, 36, 0.65);
 
     /* Glass Effect */
     --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --glass-border: rgba(225, 29, 72, 0.15);
+    --glass-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
 
     /* Text */
-    --text-primary: hsl(0, 0%, 98%);
-    --text-secondary: hsl(230, 15%, 65%);
-    --text-muted: hsl(230, 15%, 45%);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
 
     /* Status */
     --success: hsl(150, 85%, 45%);
@@ -138,29 +138,31 @@ select {
 .orb-1 {
     width: 600px;
     height: 600px;
-    background: linear-gradient(135deg, var(--primary), var(--accent-pink));
+    background: linear-gradient(135deg, #e11d48, #990011);
     top: -200px;
     left: -200px;
     animation-delay: 0s;
+    opacity: 0.35;
 }
 
 .orb-2 {
     width: 500px;
     height: 500px;
-    background: linear-gradient(135deg, var(--accent-cyan), var(--primary));
+    background: linear-gradient(135deg, #880517, #be123c);
     bottom: -150px;
     right: -150px;
     animation-delay: -7s;
+    opacity: 0.3;
 }
 
 .orb-3 {
     width: 400px;
     height: 400px;
-    background: linear-gradient(135deg, var(--accent-pink), var(--accent-orange));
+    background: linear-gradient(135deg, #ff2a4b, #475569);
     top: 40%;
     left: 30%;
     animation-delay: -14s;
-    opacity: 0.25;
+    opacity: 0.2;
 }
 
 @keyframes float {
@@ -404,7 +406,7 @@ select {
    UTILITIES
    ============================================ */
 .gradient-text {
-    background: linear-gradient(135deg, var(--primary), var(--accent-pink));
+    background: linear-gradient(135deg, #ffffff 0%, #ff2a4b 50%, #be123c 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
