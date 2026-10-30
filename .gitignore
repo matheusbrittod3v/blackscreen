@@ -21,3 +21,10 @@ yarn-error.log*
 # System files
 .DS_Store
 Thumbs.db
+
+# Local credentials and generated dependencies
+.env
+.env.*
+!.env.example
+vendor/
+*.log
